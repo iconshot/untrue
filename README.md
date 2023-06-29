@@ -139,6 +139,30 @@ Multiple event listeners can be attached to a single event. Specially useful to 
 ```jsx
 import { Component, Node } from "untrue";
 
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { counter: 0 };
+
+    // run every second
+
+    setInterval(() => {
+      const { counter } = this.state;
+
+      this.updateState({ counter: counter + 1 });
+    }, 1000);
+  }
+
+  render() {
+    const { counter } = this.state;
+
+    // pass counter as a prop
+
+    return new Node(Child, { counter });
+  }
+}
+
 class Child extends Component {
   constructor(props) {
     super(props);
@@ -167,30 +191,6 @@ class Child extends Component {
     const { counter } = this.props;
 
     return new Node("span", counter);
-  }
-}
-
-class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = { counter: 0 };
-
-    // run every second
-
-    setInterval(() => {
-      const { counter } = this.state;
-
-      this.updateState({ counter: counter + 1 });
-    }, 1000);
-  }
-
-  render() {
-    const { counter } = this.state;
-
-    // pass counter as a prop
-
-    return new Node(Child, { counter });
   }
 }
 
