@@ -1,0 +1,21 @@
+{
+  "name": "untrue",
+  "version": "3.11.0",
+  "description": "Render web user interfaces.",
+  "homepage": "https://untrue.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iconshot/untrue.git"
+  },
+  "main": "index.js",
+  "keywords": [
+    "untrue",
+    "frontend",
+    "ui"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "eventemitter3": "^5.0.0",
+    "uuid": "^9.0.0"
+  }
+}
