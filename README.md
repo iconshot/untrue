@@ -1,5 +1,6 @@
 # [Untrue](https://untrue.dev/)
-JavaScript library for rendering user interfaces on web.
+
+JavaScript library for rendering web user interfaces.
 
 ## Installation
 
@@ -27,11 +28,11 @@ tree.mount(new Node(App));
 
 More on `App` in the next section.
 
-## Basics
+## Basic features
 
-### Reactive
+### Reactivity
 
-Untrue knows which nodes should be updated in the DOM.
+A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
 ```js
 import { Component, Node } from "untrue";
@@ -65,24 +66,20 @@ export default App;
 The output HTML will be:
 
 ```html
-<span>0</span>
-<button>increment</button>
+<span>0</span> <button>increment</button>
 ```
 
-`span` will be updated with the new `counter` every time `button` is clicked. 
+`span` will be updated with the new `counter` every time `button` is clicked.
 
-### Encapsulated
+### Modularity
 
-Components can be classes or functions, and are used to group multiple nodes.
+Components can be classes or functions and are used to group multiple nodes.
 
 ```jsx
 import { Component, Node } from "untrue";
 
 function Header() {
-  return [
-    new Node("h1", "untrue"),
-    new Node("span", "made to win")
-  ];
+  return [new Node("h1", "untrue"), new Node("span", "made to win")];
 }
 
 class Content extends Component {
@@ -106,10 +103,7 @@ class Content extends Component {
 }
 
 function App() {
-  return [
-    new Node(Header),
-    new Node(Content)
-  ];
+  return [new Node(Header), new Node(Content)];
 }
 
 export default App;
@@ -125,3 +119,74 @@ The output HTML will be:
 
 `p` will be updated with the new `counter` every second because of the `setInterval`.
 
+### Lifecycle events
+
+- `render`: Every render, whether it's a mount or an update.
+- `mount`: The first render.
+- `update`: Every rerender, whether it's caused by the component itself or a parent component.
+- `unmount`: Component is no longer part of the Tree.
+
+```jsx
+import { Component, Node } from "untrue";
+
+class Child extends Component {
+  constructor(props) {
+    super(props);
+
+    this.on("mount", () => {
+      console.log("mounted");
+    });
+
+    this.on("update", () => {
+      console.log("updated", this.props, this.prevProps);
+
+      const { counter } = this.props;
+      const { counter: prevCounter } = this.prevProps;
+
+      if (counter !== prevCounter) {
+        console.log("counter has been updated");
+      }
+    });
+
+    this.on("unmount", () => {
+      console.log("unmounted");
+    });
+  }
+
+  render() {
+    const { counter } = this.props;
+
+    return new Node("span", counter);
+  }
+}
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { counter: 0 };
+
+    setInterval(() => {
+      const { counter } = this.state;
+
+      this.updateState({ counter: counter + 1 });
+    }, 1000);
+  }
+
+  render() {
+    const { counter } = this.state;
+
+    return new Node(Child, { counter });
+  }
+}
+
+export default App;
+```
+
+The output HTML will be:
+
+```html
+<span>0</h1>
+```
+
+`span` will be updated with the new `counter` every second because of the `setInterval`.
