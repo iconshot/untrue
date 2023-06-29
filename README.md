@@ -26,6 +26,8 @@ const tree = new Tree(root);
 tree.mount(new Node(App));
 ```
 
+In this case, we're adding Untrue to `root`.
+
 More on `App` in the next section.
 
 ## Basic features
@@ -51,6 +53,8 @@ class App extends Component {
   };
 
   render() {
+    // after the first click, counter is no longer 0 but 1
+
     const { counter } = this.state;
 
     return [
@@ -79,6 +83,8 @@ Components can be classes or functions and are used to group multiple nodes.
 import { Component, Node } from "untrue";
 
 function Header() {
+  // regular arrays are used to return multiple nodes
+
   return [new Node("h1", "untrue"), new Node("span", "made to win")];
 }
 
@@ -87,6 +93,8 @@ class Content extends Component {
     super(props);
 
     this.state = { counter: 0 };
+
+    // increment counter every second
 
     setInterval(() => {
       const { counter } = this.state;
@@ -126,6 +134,8 @@ The output HTML will be:
 - `update`: Every rerender, whether it's caused by the component itself or a parent component.
 - `unmount`: Component is no longer part of the Tree.
 
+Multiple event listeners can be attached to a single event. Specially useful to separate related code.
+
 ```jsx
 import { Component, Node } from "untrue";
 
@@ -134,22 +144,22 @@ class Child extends Component {
     super(props);
 
     this.on("mount", () => {
-      console.log("mounted");
+      // mounted
     });
 
     this.on("update", () => {
-      console.log("updated", this.props, this.prevProps);
+      // updated
 
       const { counter } = this.props;
       const { counter: prevCounter } = this.prevProps;
 
       if (counter !== prevCounter) {
-        console.log("counter has been updated");
+        // counter has been updated
       }
     });
 
     this.on("unmount", () => {
-      console.log("unmounted");
+      // unmounted
     });
   }
 
@@ -166,6 +176,8 @@ class App extends Component {
 
     this.state = { counter: 0 };
 
+    // run every second
+
     setInterval(() => {
       const { counter } = this.state;
 
@@ -175,6 +187,8 @@ class App extends Component {
 
   render() {
     const { counter } = this.state;
+
+    // pass counter as a prop
 
     return new Node(Child, { counter });
   }
