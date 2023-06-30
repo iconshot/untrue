@@ -109,11 +109,7 @@ class Header extends Component {
   render() {
     const { title } = this.props;
 
-    // after the first click, counter is no longer 0 but 1
-
     const { counter } = this.state;
-
-    // regular arrays are used to return multiple nodes
 
     return new Node("header", [
       new Node("h1", title),
