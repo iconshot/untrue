@@ -88,8 +88,8 @@ import { Component, Node } from "untrue";
 
 function App() {
   return [
-    new Node(Header, { title: "Untrue" }), // pass title as prop
-    new Node(Footer, { year: 2049 }), // pass year as prop
+    new Node(Header, { title: "Untrue" }), // pass title as prop (external data)
+    new Node(Footer, { year: 2049 }), // pass year as prop (external data)
   ];
 }
 
@@ -107,9 +107,9 @@ class Header extends Component {
   };
 
   render() {
-    const { title } = this.props;
+    const { title } = this.props; // external data
 
-    const { counter } = this.state;
+    const { counter } = this.state; // internal data
 
     return new Node("header", [
       new Node("h1", title),
