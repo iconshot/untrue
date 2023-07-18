@@ -1,10 +1,10 @@
 # [Untrue](https://untrue.dev/)
 
-JavaScript library for rendering web and native user interfaces.
+JavaScript library for rendering user interfaces.
 
 ## Installation
 
-The easiest way to get started with Untrue is though a web app.
+The easiest way to get started with Untrue is through a web app.
 
 ```
 npm i untrue @untrue/web
