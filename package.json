@@ -1,7 +1,7 @@
 {
   "name": "untrue",
-  "version": "3.11.9",
-  "description": "Render web user interfaces.",
+  "version": "4.0.1",
+  "description": "Render web and native user interfaces.",
   "homepage": "https://untrue.dev",
   "repository": {
     "type": "git",

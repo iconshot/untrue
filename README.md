@@ -1,11 +1,11 @@
 # [Untrue](https://untrue.dev/)
 
-JavaScript library for rendering web user interfaces.
+JavaScript library for rendering web and native user interfaces.
 
 ## Installation
 
 ```
-npm i untrue
+npm i untrue @untrue/web
 ```
 
 Compatible with any build tool: [Parcel](https://parceljs.org/), [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), etc.
@@ -15,7 +15,9 @@ Compatible with any build tool: [Parcel](https://parceljs.org/), [Vite](https://
 You can add Untrue to any part of your page.
 
 ```js
-import { Node, Tree } from "untrue";
+import { Node } from "untrue";
+
+import { Tree } from "@untrue/web";
 
 import App from "./App";
 
@@ -26,7 +28,7 @@ const tree = new Tree(root);
 tree.mount(new Node(App));
 ```
 
-In this case, we're adding Untrue to `root`.
+In this case, we're adding Untrue to `#root`.
 
 More on `App` in the next section.
 

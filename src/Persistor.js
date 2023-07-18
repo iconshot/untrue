@@ -3,21 +3,25 @@ import { Context } from "./Context";
 import { Wrapper } from "./Wrapper";
 
 export class Persistor extends Context {
-  constructor({ name = "app", version = 0, contexts = {}, migrations = {} }) {
+  constructor(
+    contexts,
+    Storage,
+    { name = "app", version = 0, migrations = {} } = {}
+  ) {
     super();
 
     // "loaded" is used by the Provider
 
     this.state = { loaded: false };
 
-    this.name = name; // name of the localStorage item
+    this.Storage = Storage;
 
-    this.version = version;
     this.contexts = contexts;
 
-    // migrations are sorted in migrate()
+    this.name = name; // name of the Storage item
+    this.version = version; // content version of the Storage item
 
-    this.migrations = migrations;
+    this.migrations = migrations; // migrations are sorted in migrate()
 
     const self = this;
 
@@ -52,18 +56,18 @@ export class Persistor extends Context {
     this.persistListener = () => {
       clearTimeout(this.persistTimeout);
 
-      this.persistTimeout = setTimeout(() => {
-        this.persist();
+      this.persistTimeout = setTimeout(async () => {
+        await this.persist();
       });
     };
   }
 
   // init() is called when the Provider is mounted
 
-  init() {
-    // content can be null when there's not an item found with the name this.name in localStorage
+  async init() {
+    // content can be null when there's not an item found with the name this.name in Storage
 
-    const content = this.read();
+    const content = await this.read();
 
     let data = {};
 
@@ -88,20 +92,20 @@ export class Persistor extends Context {
     /*
     
     even if there's no updates yet, we write the content,
-    so the localStorage item's data replicates the contexts state from the beginning
+    so the Storage item's data replicates the contexts state from the beginning
 
     */
 
-    this.persist();
+    await this.persist();
 
     // update state so Provider knows when to render the tree
 
     this.updateState({ loaded: true });
   }
 
-  // generate the content for the localStorage's item and write it
+  // generate the content for the Storage item and write it
 
-  persist() {
+  async persist() {
     const content = { data: {}, version: this.version };
 
     for (const key in this.contexts) {
@@ -110,25 +114,29 @@ export class Persistor extends Context {
       content.data[key] = context.persist();
     }
 
-    this.write(content);
+    await this.write(content);
   }
 
-  read() {
+  async read() {
     // if found, content is read as a JSON
 
-    const value = window.localStorage.getItem(this.name);
+    const { Storage } = this;
+
+    const value = await Storage.getItem(this.name);
 
     const content = value !== null ? JSON.parse(value) : null;
 
     return content;
   }
 
-  write(content) {
+  async write(content) {
     // content is written as a json
+
+    const { Storage } = this;
 
     const value = JSON.stringify(content);
 
-    window.localStorage.setItem(this.name, value);
+    await Storage.setItem(this.name, value);
   }
 
   migrate(data, version) {
