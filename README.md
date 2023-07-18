@@ -4,11 +4,15 @@ JavaScript library for rendering web and native user interfaces.
 
 ## Installation
 
+The easiest way to get started with Untrue is though a web app.
+
 ```
 npm i untrue @untrue/web
 ```
 
 Compatible with any build tool: [Parcel](https://parceljs.org/), [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), etc.
+
+For native development, refer to [Untrue Native](https://untrue.dev/native).
 
 ## Get started
 
