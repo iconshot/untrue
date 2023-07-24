@@ -12,7 +12,7 @@ npm i untrue @untrue/web
 
 Compatible with any build tool: [Parcel](https://parceljs.org/), [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), etc.
 
-For native development, refer to [Untrue Native](https://untrue.dev/native).
+Native app development coming soon.
 
 ## Get started
 
@@ -38,7 +38,7 @@ More on `App` in the next section.
 
 ## Basic features
 
-### Reactivity
+### Interactivity
 
 A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
