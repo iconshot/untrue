@@ -1,5 +1,6 @@
 import { Node } from "./Node";
 import { Component } from "./Component";
+import { Comparer } from "./Comparer";
 
 export class Wrapper {
   static wrapProps(Child, closure) {
@@ -157,7 +158,7 @@ export class Wrapper {
         try {
           const result = this.select();
 
-          const updated = !this.compareDeep(result, this.result);
+          const updated = !Comparer.compareDeep(result, this.result);
 
           if (updated) {
             this.update();
