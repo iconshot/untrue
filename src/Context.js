@@ -1,6 +1,8 @@
-import { Emitter } from "./Emitter";
+import { EventEmitter } from "eventemitter3";
 
-export class Context extends Emitter {
+import { Comparer } from "./Comparer";
+
+export class Context extends EventEmitter {
   constructor() {
     super();
 
@@ -151,7 +153,7 @@ export class Context extends Emitter {
 
     const currentState = { ...this.state, ...this.nextState };
 
-    const updated = !this.compareDeep(tmpState, currentState);
+    const updated = !Comparer.compareDeep(tmpState, currentState);
 
     if (updated) {
       this.nextState = tmpState;

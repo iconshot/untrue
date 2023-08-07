@@ -1,8 +1,10 @@
+import { EventEmitter } from "eventemitter3";
+
 import { v4 as uuid } from "uuid";
 
-import { Emitter } from "./Emitter";
+import { Comparer } from "./Comparer";
 
-export class Component extends Emitter {
+export class Component extends EventEmitter {
   constructor(props = {}) {
     super();
 
@@ -311,7 +313,7 @@ export class Component extends Emitter {
 
     const currentState = { ...this.state, ...this.nextState };
 
-    const updated = !this.compareDeep(tmpState, currentState);
+    const updated = !Comparer.compareDeep(tmpState, currentState);
 
     if (updated) {
       this.ensureUpdated();

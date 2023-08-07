@@ -1,4 +1,5 @@
 export * from "./src/Node";
+export * from "./src/Comparer";
 export * from "./src/Component";
 export * from "./src/Ref";
 export * from "./src/Wrapper";
