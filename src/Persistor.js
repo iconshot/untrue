@@ -56,9 +56,7 @@ export class Persistor extends Context {
     this.persistListener = () => {
       clearTimeout(this.persistTimeout);
 
-      this.persistTimeout = setTimeout(async () => {
-        await this.persist();
-      });
+      this.persistTimeout = setTimeout(() => this.persist());
     };
   }
 

@@ -136,9 +136,7 @@ export class Wrapper {
         this.compareListener = () => {
           clearTimeout(this.compareTimeout);
 
-          this.compareTimeout = setTimeout(() => {
-            this.compare();
-          });
+          this.compareTimeout = setTimeout(() => this.compare());
         };
       }
 

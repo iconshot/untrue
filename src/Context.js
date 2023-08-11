@@ -54,9 +54,7 @@ export class Context extends EventEmitter {
     this.replaceUpdated();
     this.resolveUpdated();
 
-    setTimeout(() => {
-      this.emit("update");
-    });
+    setTimeout(() => this.emit("update"));
   }
 
   async update() {
@@ -64,9 +62,7 @@ export class Context extends EventEmitter {
 
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout(() => {
-      this.triggerUpdate();
-    });
+    this.updateTimeout = setTimeout(() => this.triggerUpdate());
 
     return await this.waitUpdated();
   }

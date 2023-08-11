@@ -124,8 +124,6 @@ export class Node {
     this.type = type;
     this.attributes = attributes;
     this.children = children;
-
-    this.edge = null;
   }
 
   getType() {
@@ -138,10 +136,6 @@ export class Node {
 
   getChildren() {
     return this.children;
-  }
-
-  getEdge() {
-    return this.edge;
   }
 
   setType(type) {
@@ -178,10 +172,6 @@ export class Node {
     children = this.parseChildren(children);
 
     this.children = children;
-  }
-
-  setEdge(edge) {
-    this.edge = edge;
   }
 
   isComponent() {

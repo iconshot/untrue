@@ -33,20 +33,10 @@ export class Component extends EventEmitter {
     this.updateResolvers = []; // allows us to use await in update/updateState
 
     this.mounted = false;
-
-    this.node = null;
   }
 
   getState() {
     return this.state;
-  }
-
-  getNode() {
-    return this.node;
-  }
-
-  setNode(node) {
-    this.node = node;
   }
 
   isMounted() {
@@ -63,12 +53,14 @@ export class Component extends EventEmitter {
   */
 
   triggerRender(handler) {
-    setTimeout(() => {
-      this.emit("render");
-    });
+    setTimeout(() => this.emit("render"));
+
+    this.off("rerender");
+
+    this.on("rerender", handler);
 
     if (!this.isMounted()) {
-      this.triggerMount(handler);
+      this.triggerMount();
     }
 
     if (this.isUpdated()) {
@@ -76,14 +68,10 @@ export class Component extends EventEmitter {
     }
   }
 
-  triggerMount(handler) {
-    this.on("rerender", handler);
-
+  triggerMount() {
     this.mounted = true;
 
-    setTimeout(() => {
-      this.emit("mount");
-    });
+    setTimeout(() => this.emit("mount"));
   }
 
   triggerUnmount() {
@@ -91,9 +79,7 @@ export class Component extends EventEmitter {
 
     this.mounted = false;
 
-    setTimeout(() => {
-      this.emit("unmount");
-    });
+    setTimeout(() => this.emit("unmount"));
   }
 
   /*
@@ -127,9 +113,7 @@ export class Component extends EventEmitter {
   triggerUpdate() {
     this.resolveUpdated();
 
-    setTimeout(() => {
-      this.emit("update");
-    });
+    setTimeout(() => this.emit("update"));
   }
 
   // force an update
