@@ -336,7 +336,7 @@ export class Component extends EventEmitter {
     });
   }
 
-  // called by Tree to move nextProps and nextState
+  // move nextProps and nextState to props and state respectively
 
   replaceUpdated() {
     this.prevProps = this.props;
