@@ -20,9 +20,21 @@ export class Stateful extends EventEmitter {
     return this.state;
   }
 
+  // finish the update
+
+  triggerUpdate() {
+    this.resolveUpdated();
+
+    this.emit("update");
+  }
+
+  // force update
+
   async update() {
     return await this.startUpdated();
   }
+
+  // start updating if necessary
 
   async updateState(state) {
     const tmpState = { ...this.state, ...this.nextState, ...state };
@@ -44,15 +56,7 @@ export class Stateful extends EventEmitter {
     return await this.waitUpdated();
   }
 
-  // finish the update
-
-  triggerUpdate() {
-    this.resolveUpdated();
-
-    this.emit("update");
-  }
-
-  // returned by update/updateState to wait for a promise
+  // returned by startUpdated to wait for a promise
 
   waitUpdated() {
     return new Promise((resolve) => {
