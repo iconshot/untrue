@@ -18,102 +18,6 @@ export class Wrapper {
       contexts = [contexts];
     }
 
-    /*
-
-    let's say we have a context handler like:
-
-      await this.updateState({ counter: 1 });
-
-      await this.updateState({ counter: 2 });
-
-    the order will be:
-
-      first updateState before
-      queue triggerUpdate
-      triggerUpdate
-      queue emit update
-      first updateState after
-      second updateState before
-      queue triggerUpdate
-      emit update
-      queue compare
-      triggerUpdate
-      queue emit update
-      second updateState after
-      compare
-      queue Tree.rerender
-      emit update
-      queue compare
-      Tree.rerender
-      compare
-      App update {counter: 2, children: Array(0)}
-    
-    even though compare() is called twice, only the first one will trigger a component update
-
-    when we reach this.populate() (part of ContextWrapper.render) we have the two state changes already replaced (because of the triggerUpdate calls),
-    so select() will return the final result that will be stored in this.result,
-    therefore the second compare() will have the final value in this.result,
-    meaning that when we compare shallowly result and this.result, they will be equal
-
-    --
-
-    for a handler like:
-
-      this.updateState({ counter: 1 });
-
-      setTimeout(() => {
-        this.updateState({ counter: 2 });
-      });
-
-    the output will be:
-
-      queue triggerUpdate
-      queue timeout
-      triggerUpdate
-      queue emit update
-      timeout
-      queue triggerUpdate
-      emit update
-      queue compare
-      triggerUpdate
-      queue emit update
-      compare
-      queue Tree.rerender
-      emit update
-      queue compare
-      Tree.rerender
-      compare
-      App update {counter: 2, children: Array(0)}
-
-    --
-
-    finally, for a handler like:
-
-      setTimeout(() => {
-        this.updateState({ counter: 2 });
-      });
-
-      this.updateState({ counter: 1 });
-    
-    the output will be:
-
-      queue timeout
-      queue triggerUpdate
-      timeout
-      queue triggerUpdate
-      triggerUpdate
-      queue emit update
-      emit update
-      queue compare
-      compare
-      queue Tree.rerender
-      Tree.rerender
-      App update {counter: 2, children: Array(0)}
-
-      the second "queue triggerUpdate" will cancel the first one and requeue the call, so only one triggerUpdate is called
-
-    */
-
     return class ContextWrapper extends Component {
       constructor(props) {
         super(props);
@@ -123,13 +27,7 @@ export class Wrapper {
         this.on("mount", this.handleMountContext);
         this.on("unmount", this.handleUnmountContext);
 
-        /*
-        
-        multiple consecutive updates in contexts will be batched in a single call to compare()
-
-        consistent with Persistor.persistTimeout
-
-        */
+        // multiple consecutive updates in contexts will be batched in a single call to compare()
 
         this.compareTimeout = null;
 
