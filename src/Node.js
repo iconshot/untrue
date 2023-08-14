@@ -183,7 +183,7 @@ class Node {
   }
 
   isFunction() {
-    return typeof this.type === "function";
+    return typeof this.type === "function" && !this.isComponent();
   }
 
   isElement() {
