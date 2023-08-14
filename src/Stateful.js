@@ -1,8 +1,8 @@
-import { EventEmitter } from "eventemitter3";
+const EventEmitter = require("eventemitter3");
 
-import { Comparer } from "./Comparer";
+const Comparer = require("./Comparer");
 
-export class Stateful extends EventEmitter {
+class Stateful extends EventEmitter {
   constructor() {
     super();
 
@@ -93,3 +93,5 @@ export class Stateful extends EventEmitter {
     this.updateResolvers = [];
   }
 }
+
+module.exports = Stateful;

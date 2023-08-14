@@ -1,8 +1,8 @@
-import { Component } from "./Component";
-import { Context } from "./Context";
-import { Wrapper } from "./Wrapper";
+const Component = require("./Component");
+const Context = require("./Context");
+const Wrapper = require("./Wrapper");
 
-export class Persistor extends Context {
+class Persistor extends Context {
   constructor(
     contexts,
     Storage,
@@ -153,3 +153,5 @@ export class Persistor extends Context {
     }, data);
   }
 }
+
+module.exports = Persistor;

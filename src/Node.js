@@ -1,6 +1,6 @@
-import { Component } from "./Component";
+const Component = require("./Component");
 
-export class Node {
+class Node {
   /*
 
   constructor(children)
@@ -232,3 +232,5 @@ export class Node {
     );
   }
 }
+
+module.exports = Node;
