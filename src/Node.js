@@ -177,7 +177,8 @@ class Node {
   isComponent() {
     return (
       this.type !== null &&
-      (this.type.prototype === Component ||
+      (this.type === Component ||
+        this.type.prototype === Component ||
         this.type.prototype instanceof Component)
     );
   }
