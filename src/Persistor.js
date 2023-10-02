@@ -21,7 +21,7 @@ class Persistor extends Context {
     this.name = name; // name of the Storage item
     this.version = version; // content version of the Storage item
 
-    this.migrations = migrations; // migrations are sorted in migrate()
+    this.migrations = migrations;
 
     const self = this;
 
@@ -137,12 +137,14 @@ class Persistor extends Context {
     await Storage.setItem(this.name, value);
   }
 
-  migrate(data, version) {
-    // get versions from current version (exclusive) to this.version (inclusive)
+  // get versions from current version (exclusive) to this.version (inclusive)
 
-    const keys = Object.keys(this.migrations)
-      .filter((key) => key > version && key <= this.version)
-      .sort((a, b) => a - b);
+  migrate(data, version) {
+    // already sorted by JS
+
+    const keys = Object.keys(this.migrations).filter(
+      (key) => key > version && key <= this.version
+    );
 
     // migrate data
 
