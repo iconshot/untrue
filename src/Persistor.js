@@ -142,9 +142,9 @@ class Persistor extends Context {
   migrate(data, version) {
     // already sorted by JS
 
-    const keys = Object.keys(this.migrations).filter(
-      (key) => key > version && key <= this.version
-    );
+    const keys = Object.keys(this.migrations)
+      .map((key) => parseInt(key))
+      .filter((key) => key > version && key <= this.version);
 
     // migrate data
 
