@@ -19,7 +19,7 @@ Native app development coming soon.
 You can add Untrue to any part of your page.
 
 ```js
-import { Node } from "untrue";
+import { $ } from "untrue";
 
 import { Tree } from "@untrue/web";
 
@@ -29,7 +29,9 @@ const root = document.getElementById("root");
 
 const tree = new Tree(root);
 
-tree.mount(new Node(App));
+// $ is a shorthand to represent nodes
+
+tree.mount($(App));
 ```
 
 In this case, we're adding Untrue to `#root`.
@@ -43,7 +45,7 @@ More on `App` in the next section.
 A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
 ```js
-import { Component, Node } from "untrue";
+import { $, Component } from "untrue";
 
 class App extends Component {
   constructor(props) {
@@ -66,8 +68,8 @@ class App extends Component {
     // regular arrays are used to return multiple nodes
 
     return [
-      new Node("span", counter),
-      new Node("button", { onclick: this.onIncrement }, "increment"),
+      $("span", counter),
+      $("button", { onclick: this.onIncrement }, "increment"),
     ];
   }
 }
@@ -90,12 +92,12 @@ The output HTML will be:
 Components can be classes or functions and are used to group multiple nodes.
 
 ```jsx
-import { Component, Node } from "untrue";
+import { $, Component } from "untrue";
 
 function App() {
   return [
-    new Node(Header, { title: "Untrue" }), // pass title as prop (external data)
-    new Node(Footer, { year: 2049 }), // pass year as prop (external data)
+    $(Header, { title: "Untrue" }), // pass title as prop (external data)
+    $(Footer, { year: 2049 }), // pass year as prop (external data)
   ];
 }
 
@@ -117,18 +119,18 @@ class Header extends Component {
 
     const { counter } = this.state; // internal data
 
-    return new Node("header", [
-      new Node("h1", title),
-      new Node("span", counter),
-      new Node("button", { onclick: this.onIncrement }, "increment"),
+    return $("header", [
+      $("h1", title),
+      $("span", counter),
+      $("button", { onclick: this.onIncrement }, "increment"),
     ]);
   }
 }
 
 function Footer({ year }) {
-  return new Node("footer", [
-    new Node("span", `copyright, ${year}`),
-    new Node("a", { href: "https://example.com" }, "follow me"),
+  return $("footer", [
+    $("span", `copyright, ${year}`),
+    $("a", { href: "https://example.com" }, "follow me"),
   ]);
 }
 
@@ -161,7 +163,7 @@ The output HTML will be:
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
 ```jsx
-import { Component, Node } from "untrue";
+import { $, Component } from "untrue";
 
 class App extends Component {
   constructor(props) {
@@ -204,7 +206,7 @@ class App extends Component {
   render() {
     const { counter } = this.state;
 
-    return new Node("span", counter);
+    return $("span", counter);
   }
 }
 

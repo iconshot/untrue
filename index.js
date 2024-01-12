@@ -6,7 +6,12 @@ const Context = require("./src/Context");
 const Persistor = require("./src/Persistor");
 const Comparer = require("./src/Comparer");
 
+function $(...args) {
+  return new Node(...args);
+}
+
 module.exports = {
+  $,
   Node,
   Component,
   Ref,
