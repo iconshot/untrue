@@ -19,7 +19,7 @@ Native app development coming soon.
 You can add Untrue to any part of your page.
 
 ```js
-import { $ } from "untrue";
+import $ from "untrue";
 
 import { Tree } from "@untrue/web";
 
@@ -45,7 +45,7 @@ More on `App` in the next section.
 A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
 ```js
-import { $, Component } from "untrue";
+import $, { Component } from "untrue";
 
 class App extends Component {
   constructor(props) {
@@ -92,7 +92,7 @@ The output HTML will be:
 Components can be classes or functions and are used to group multiple nodes.
 
 ```jsx
-import { $, Component } from "untrue";
+import $, { Component } from "untrue";
 
 function App() {
   return [
@@ -163,7 +163,7 @@ The output HTML will be:
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
 ```jsx
-import { $, Component } from "untrue";
+import $, { Component } from "untrue";
 
 class App extends Component {
   constructor(props) {
