@@ -1,8 +1,8 @@
-const Node = require("./Node");
-const Component = require("./Component");
-const Comparer = require("./Comparer");
+import { Node } from "./Node.js";
+import { Component } from "./Component.js";
+import { Comparer } from "./Comparer.js";
 
-class Wrapper {
+export class Wrapper {
   static wrapProps(Child, closure) {
     // create a PropsWrapper function component
 
@@ -92,5 +92,3 @@ class Wrapper {
     };
   }
 }
-
-module.exports = Wrapper;

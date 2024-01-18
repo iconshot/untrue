@@ -1,6 +1,6 @@
-const Stateful = require("./Stateful");
+import { Stateful } from "./Stateful.js";
 
-class Component extends Stateful {
+export class Component extends Stateful {
   constructor(props = {}) {
     super();
 
@@ -74,5 +74,3 @@ class Component extends Stateful {
     return [];
   }
 }
-
-module.exports = Component;

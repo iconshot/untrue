@@ -1,4 +1,4 @@
-class Ref {
+export class Ref {
   constructor(value = null) {
     this.value = value;
   }
@@ -11,5 +11,3 @@ class Ref {
     this.value = value;
   }
 }
-
-module.exports = Ref;

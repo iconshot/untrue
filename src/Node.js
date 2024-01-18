@@ -1,6 +1,6 @@
-const Component = require("./Component");
+import { Component } from "./Component.js";
 
-class Node {
+export class Node {
   /*
 
   constructor(children)
@@ -233,5 +233,3 @@ class Node {
     );
   }
 }
-
-module.exports = Node;

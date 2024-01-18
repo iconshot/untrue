@@ -1,4 +1,4 @@
-class Comparer {
+export class Comparer {
   /*
 
   compareShallow will receive two objects
@@ -153,5 +153,3 @@ class Comparer {
     );
   }
 }
-
-module.exports = Comparer;

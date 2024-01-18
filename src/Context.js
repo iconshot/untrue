@@ -1,6 +1,6 @@
-const Stateful = require("./Stateful");
+import { Stateful } from "./Stateful.js";
 
-class Context extends Stateful {
+export class Context extends Stateful {
   // methods used by Persistor
 
   persist() {
@@ -25,5 +25,3 @@ class Context extends Stateful {
     return await super.startUpdated();
   }
 }
-
-module.exports = Context;

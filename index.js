@@ -1,22 +1,15 @@
-const Node = require("./src/Node");
-const Component = require("./src/Component");
-const Ref = require("./src/Ref");
-const Wrapper = require("./src/Wrapper");
-const Context = require("./src/Context");
-const Persistor = require("./src/Persistor");
-const Comparer = require("./src/Comparer");
+import { Node } from "./src/Node.js";
 
 function $(...args) {
   return new Node(...args);
 }
 
-module.exports = {
-  $,
-  Node,
-  Component,
-  Ref,
-  Wrapper,
-  Context,
-  Persistor,
-  Comparer,
-};
+export default $;
+
+export * from "./src/Node.js";
+export * from "./src/Component.js";
+export * from "./src/Ref.js";
+export * from "./src/Wrapper.js";
+export * from "./src/Context.js";
+export * from "./src/Persistor.js";
+export * from "./src/Comparer.js";
