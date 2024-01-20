@@ -1,6 +1,6 @@
-import { Stateful } from "./Stateful.js";
+import Stateful from "./Stateful.js";
 
-export class Context extends Stateful {
+class Context extends Stateful {
   // methods used by Persistor
 
   persist() {
@@ -12,16 +12,18 @@ export class Context extends Stateful {
   }
 
   triggerUpdate() {
-    this.replaceUpdated();
+    this.replaceUpdate();
 
     super.triggerUpdate();
   }
 
-  async startUpdated() {
+  async startUpdate() {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout(() => this.triggerUpdate());
 
-    return await super.startUpdated();
+    return await super.startUpdate();
   }
 }
+
+export default Context;

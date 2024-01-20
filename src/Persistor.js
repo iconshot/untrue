@@ -1,8 +1,8 @@
-import { Component } from "./Component.js";
-import { Context } from "./Context.js";
-import { Wrapper } from "./Wrapper.js";
+import Component from "./Component.js";
+import Context from "./Context.js";
+import Wrapper from "./Wrapper.js";
 
-export class Persistor extends Context {
+class Persistor extends Context {
   constructor(
     contexts,
     Storage,
@@ -155,3 +155,5 @@ export class Persistor extends Context {
     }, data);
   }
 }
+
+export default Persistor;

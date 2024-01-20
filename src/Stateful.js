@@ -1,8 +1,8 @@
 import EventEmitter from "eventemitter3";
 
-import { Comparer } from "./Comparer.js";
+import Comparer from "./Comparer.js";
 
-export class Stateful extends EventEmitter {
+class Stateful extends EventEmitter {
   constructor() {
     super();
 
@@ -23,7 +23,7 @@ export class Stateful extends EventEmitter {
   // finish the update
 
   triggerUpdate() {
-    this.resolveUpdated();
+    this.resolveUpdate();
 
     this.emit("update");
   }
@@ -31,7 +31,7 @@ export class Stateful extends EventEmitter {
   // force update
 
   async update() {
-    return await this.startUpdated();
+    return await this.startUpdate();
   }
 
   // start updating if necessary
@@ -46,19 +46,13 @@ export class Stateful extends EventEmitter {
     if (updated) {
       this.nextState = tmpState;
 
-      return await this.startUpdated();
+      return await this.startUpdate();
     }
   }
 
   // override, add logic before returning
 
-  async startUpdated() {
-    return await this.waitUpdated();
-  }
-
-  // returned by startUpdated to wait for a promise
-
-  waitUpdated() {
+  startUpdate() {
     return new Promise((resolve) => {
       this.updateResolvers.push(resolve);
     });
@@ -66,7 +60,7 @@ export class Stateful extends EventEmitter {
 
   // move nextState to state
 
-  replaceUpdated() {
+  replaceUpdate() {
     this.prevState = this.state;
 
     if (this.nextState !== null) {
@@ -76,7 +70,7 @@ export class Stateful extends EventEmitter {
     this.nextState = null;
   }
 
-  resolveUpdated() {
+  resolveUpdate() {
     /*
     
     resolvers run in a microtask because of the nature of Promises
@@ -93,3 +87,5 @@ export class Stateful extends EventEmitter {
     this.updateResolvers = [];
   }
 }
+
+export default Stateful;

@@ -1,4 +1,10 @@
-import { Node } from "./src/Node.js";
+import Node from "./src/Node.js";
+import Component from "./src/Component.js";
+import Ref from "./src/Ref.js";
+import Wrapper from "./src/Wrapper.js";
+import Context from "./src/Context.js";
+import Persistor from "./src/Persistor.js";
+import Comparer from "./src/Comparer.js";
 
 function $(...args) {
   return new Node(...args);
@@ -6,10 +12,4 @@ function $(...args) {
 
 export default $;
 
-export * from "./src/Node.js";
-export * from "./src/Component.js";
-export * from "./src/Ref.js";
-export * from "./src/Wrapper.js";
-export * from "./src/Context.js";
-export * from "./src/Persistor.js";
-export * from "./src/Comparer.js";
+export { Node, Component, Ref, Wrapper, Context, Persistor, Comparer };

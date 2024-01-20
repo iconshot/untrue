@@ -1,6 +1,6 @@
-import { Stateful } from "./Stateful.js";
+import Stateful from "./Stateful.js";
 
-export class Component extends Stateful {
+class Component extends Stateful {
   constructor(props = {}) {
     super();
 
@@ -42,24 +42,20 @@ export class Component extends Stateful {
     this.emit("unmount");
   }
 
-  updateProps(props) {
-    this.nextProps = props;
-  }
-
   // the component will receive a "rerender" handler via triggerRender
 
-  async startUpdated() {
+  async startUpdate() {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout(() => this.emit("rerender"));
 
-    return await super.startUpdated();
+    return await super.startUpdate();
   }
 
   // move nextState and nextProps to state and props respectively
 
-  replaceUpdated() {
-    super.replaceUpdated();
+  replaceUpdate() {
+    super.replaceUpdate();
 
     this.prevProps = this.props;
 
@@ -70,7 +66,17 @@ export class Component extends Stateful {
     this.nextProps = null;
   }
 
+  prepareUpdate(props) {
+    this.nextProps = props;
+
+    this.replaceUpdate();
+
+    clearTimeout(this.updateTimeout);
+  }
+
   render() {
     return [];
   }
 }
+
+export default Component;

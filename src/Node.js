@@ -1,6 +1,6 @@
-import { Component } from "./Component.js";
+import Component from "./Component.js";
 
-export class Node {
+class Node {
   /*
 
   constructor(children)
@@ -233,3 +233,5 @@ export class Node {
     );
   }
 }
+
+export default Node;
