@@ -12,7 +12,7 @@ class Context extends Stateful {
   }
 
   triggerUpdate() {
-    this.replaceUpdate();
+    this.prepareUpdate();
 
     super.triggerUpdate();
   }

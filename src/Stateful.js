@@ -11,30 +11,22 @@ class Stateful extends EventEmitter {
     this.prevState = null;
     this.nextState = null;
 
-    this.updateTimeout = null; // batch multiple update calls
+    this.updateTimeout = null;
 
-    this.updateResolvers = []; // allows us to use await in update/updateState
+    this.updateResolvers = [];
   }
 
   getState() {
     return this.state;
   }
 
-  // finish the update
-
   triggerUpdate() {
-    this.resolveUpdate();
-
     this.emit("update");
   }
-
-  // force update
 
   async update() {
     return await this.startUpdate();
   }
-
-  // start updating if necessary
 
   async updateState(state) {
     const tmpState = { ...this.state, ...this.nextState, ...state };
@@ -50,15 +42,16 @@ class Stateful extends EventEmitter {
     }
   }
 
-  // override, add logic before returning
-
   startUpdate() {
     return new Promise((resolve) => {
       this.updateResolvers.push(resolve);
     });
   }
 
-  // move nextState to state
+  prepareUpdate() {
+    this.replaceUpdate();
+    this.resolveUpdate();
+  }
 
   replaceUpdate() {
     this.prevState = this.state;
@@ -71,17 +64,6 @@ class Stateful extends EventEmitter {
   }
 
   resolveUpdate() {
-    /*
-    
-    resolvers run in a microtask because of the nature of Promises
-
-    the order will be:
-
-    update event
-    promise
-
-    */
-
     this.updateResolvers.forEach((resolve) => resolve());
 
     this.updateResolvers = [];

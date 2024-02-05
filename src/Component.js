@@ -52,7 +52,13 @@ class Component extends Stateful {
     return await super.startUpdate();
   }
 
-  // move nextState and nextProps to state and props respectively
+  prepareUpdate(props) {
+    this.nextProps = props;
+
+    clearTimeout(this.updateTimeout);
+
+    super.prepareUpdate();
+  }
 
   replaceUpdate() {
     super.replaceUpdate();
@@ -64,14 +70,6 @@ class Component extends Stateful {
     }
 
     this.nextProps = null;
-  }
-
-  prepareUpdate(props) {
-    this.nextProps = props;
-
-    this.replaceUpdate();
-
-    clearTimeout(this.updateTimeout);
   }
 
   render() {
