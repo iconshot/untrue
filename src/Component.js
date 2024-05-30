@@ -15,7 +15,7 @@ class Component extends Stateful {
   // triggerRender will be called by a renderer abstraction
 
   triggerRender(handler) {
-    this.emit("render");
+    queueMicrotask(() => this.emit("render"));
 
     this.off("rerender");
 
@@ -31,7 +31,7 @@ class Component extends Stateful {
   triggerMount() {
     this.mounted = true;
 
-    this.emit("mount");
+    queueMicrotask(() => this.emit("mount"));
   }
 
   triggerUnmount() {
@@ -39,7 +39,7 @@ class Component extends Stateful {
 
     this.mounted = false;
 
-    this.emit("unmount");
+    queueMicrotask(() => this.emit("unmount"));
   }
 
   // the component will receive a "rerender" handler via triggerRender
