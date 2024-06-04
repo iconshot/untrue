@@ -21,7 +21,13 @@ class Stateful extends EventEmitter {
   }
 
   triggerUpdate() {
-    queueMicrotask(() => this.emit("update"));
+    try {
+      this.emit("update");
+    } catch (error) {
+      queueMicrotask(() => {
+        throw error;
+      });
+    }
   }
 
   async update() {
