@@ -91,7 +91,7 @@ The output HTML will be:
 
 Components can be classes or functions and are used to group multiple nodes.
 
-```jsx
+```js
 import $, { Component } from "untrue";
 
 function App() {
@@ -162,7 +162,7 @@ The output HTML will be:
 
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
-```jsx
+```js
 import $, { Component } from "untrue";
 
 class App extends Component {
@@ -198,7 +198,7 @@ class App extends Component {
       const { counter: prevCounter } = this.prevState;
 
       if (counter !== prevCounter) {
-        alert("Counter has been updated.");
+        console.log("Counter has been updated.", { counter, prevCounter });
       }
     });
   }
@@ -219,4 +219,4 @@ The output HTML will be:
 <span>0</span>
 ```
 
-An `alert` will happen every 5 seconds because `interval` updates `counter` on every call.
+A `log` will happen every 5 seconds because `interval` updates `counter` on every call.
