@@ -1,11 +1,15 @@
+import EventEmitter from "eventemitter3";
+
 import Component from "./Component.js";
 
-class Persistor {
+class Persistor extends EventEmitter {
   constructor(
     contexts,
     Storage,
     { name = "app", version = 0, migrations = {} } = {}
   ) {
+    super();
+
     this.Storage = Storage;
 
     this.contexts = contexts;
@@ -21,23 +25,39 @@ class Persistor {
       constructor(props) {
         super(props);
 
-        this.state = { loaded: false };
+        this.state = { loading: true, error: false };
 
         // init the Persistor on mount
 
         this.on("mount", async () => {
-          await self.init();
+          try {
+            await self.init();
+          } catch (error) {
+            this.updateState({ error: true });
 
-          this.updateState({ loaded: true });
+            queueMicrotask(() => {
+              throw error;
+            });
+          } finally {
+            this.updateState({ loading: false });
+          }
         });
       }
 
       render() {
-        const { loadingNode, children } = this.props;
+        const { loadingNode = null, errorNode = null, children } = this.props;
 
-        const { loaded } = this.state;
+        const { loading, error } = this.state;
 
-        return !loaded ? loadingNode : children;
+        if (error) {
+          return errorNode;
+        }
+
+        if (loading) {
+          return loadingNode;
+        }
+
+        return children;
       }
     };
 
@@ -87,6 +107,8 @@ class Persistor {
     */
 
     await this.persist();
+
+    this.emit("init");
   }
 
   // generate the content for the Storage item and write it
