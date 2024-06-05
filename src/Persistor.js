@@ -1,19 +1,11 @@
 import Component from "./Component.js";
-import Context from "./Context.js";
-import Wrapper from "./Wrapper.js";
 
-class Persistor extends Context {
+class Persistor {
   constructor(
     contexts,
     Storage,
     { name = "app", version = 0, migrations = {} } = {}
   ) {
-    super();
-
-    // "loaded" is used by the Provider
-
-    this.state = { loaded: false };
-
     this.Storage = Storage;
 
     this.contexts = contexts;
@@ -25,29 +17,29 @@ class Persistor extends Context {
 
     const self = this;
 
-    this.Provider = Wrapper.wrapContext(
-      class PersistorProvider extends Component {
-        constructor(props) {
-          super(props);
+    this.Provider = class PersistorProvider extends Component {
+      constructor(props) {
+        super(props);
 
-          // init the Persistor on mount
+        this.state = { loaded: false };
 
-          this.on("mount", () => self.init());
-        }
+        // init the Persistor on mount
 
-        render() {
-          const { loaded, loadingNode, children } = this.props;
+        this.on("mount", async () => {
+          await self.init();
 
-          return !loaded ? loadingNode : children;
-        }
-      },
-      self,
-      () => {
-        const { loaded } = self.getState();
-
-        return { loaded };
+          this.updateState({ loaded: true });
+        });
       }
-    );
+
+      render() {
+        const { loadingNode, children } = this.props;
+
+        const { loaded } = this.state;
+
+        return !loaded ? loadingNode : children;
+      }
+    };
 
     // multiple consecutive updates in contexts will be batched in a single call to persist()
 
@@ -95,10 +87,6 @@ class Persistor extends Context {
     */
 
     await this.persist();
-
-    // update state so Provider knows when to render the tree
-
-    this.updateState({ loaded: true });
   }
 
   // generate the content for the Storage item and write it
