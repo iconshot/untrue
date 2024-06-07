@@ -35,9 +35,7 @@ class Persistor extends EventEmitter {
           } catch (error) {
             this.updateState({ error: true });
 
-            queueMicrotask(() => {
-              throw error;
-            });
+            throw error;
           } finally {
             this.updateState({ loading: false });
           }

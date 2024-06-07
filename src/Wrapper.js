@@ -7,14 +7,10 @@ class Wrapper {
     // create a PropsWrapper function component
 
     return function PropsWrapper({ children, ...props }) {
-      let result = {};
+      const result = closure(props);
 
-      try {
-        result = closure(props);
-      } catch (error) {
-        queueMicrotask(() => {
-          throw error;
-        });
+      if (result === null) {
+        return null;
       }
 
       return new Node(Child, { ...props, ...result }, children);
@@ -30,7 +26,7 @@ class Wrapper {
       constructor(props) {
         super(props);
 
-        this.result = {}; // result returned by this.select()
+        this.result = null; // result returned by this.select()
 
         this.on("mount", this.handleMountContext);
         this.on("unmount", this.handleUnmountContext);
@@ -61,59 +57,43 @@ class Wrapper {
       // returned result will be merged with props and passed to Child
 
       select() {
-        try {
-          return selectors.reduce((result, selector) => {
-            if (result === null) {
-              return null;
-            }
+        return selectors.reduce((result, selector) => {
+          if (result === null) {
+            return null;
+          }
 
-            const newProps = { ...this.props, ...result };
+          const newProps = { ...this.props, ...result };
 
-            const newResult = selector(newProps);
+          const newResult = selector(newProps);
 
-            if (newResult === null) {
-              return null;
-            }
+          if (newResult === null) {
+            return null;
+          }
 
-            return { ...result, ...newResult };
-          }, {});
-        } catch (error) {
-          queueMicrotask(() => {
-            throw error;
-          });
-
-          return null;
-        }
-      }
-
-      populate() {
-        const result = this.select();
-
-        if (result === null) {
-          return;
-        }
-
-        this.result = result;
+          return { ...result, ...newResult };
+        }, {});
       }
 
       compare() {
         const result = this.select();
 
-        if (result === null) {
+        const equal = Comparer.compare(result, this.result);
+
+        if (equal) {
           return;
         }
 
-        const updated = !Comparer.compareDeep(result, this.result);
-
-        if (updated) {
-          this.update();
-        }
+        this.update();
       }
 
       render() {
         const { children, ...props } = this.props;
 
-        this.populate(); // needed so we handle both update() calls and new props
+        this.result = this.select(); // it handles both update() calls and new props
+
+        if (this.result === null) {
+          return null;
+        }
 
         return new Node(Child, { ...props, ...this.result }, children);
       }

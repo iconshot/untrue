@@ -39,13 +39,15 @@ class Stateful extends EventEmitter {
 
     const currentState = { ...this.state, ...this.nextState };
 
-    const updated = !Comparer.compareDeep(tmpState, currentState);
+    const equal = Comparer.compare(tmpState, currentState);
 
-    if (updated) {
-      this.nextState = tmpState;
-
-      return await this.startUpdate();
+    if (equal) {
+      return;
     }
+
+    this.nextState = tmpState;
+
+    return await this.startUpdate();
   }
 
   startUpdate() {
