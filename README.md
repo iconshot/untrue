@@ -25,16 +25,14 @@ import { Tree } from "@untrue/web";
 
 import App from "./App";
 
-const root = document.getElementById("root");
-
-const tree = new Tree(root);
+const tree = new Tree(document.body);
 
 // $ is a shorthand to represent nodes
 
 tree.mount($(App));
 ```
 
-In this case, we're adding Untrue to `#root`.
+In this case, we're adding Untrue to `body`.
 
 More on `App` in the next section.
 
