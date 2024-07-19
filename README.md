@@ -66,8 +66,8 @@ class App extends Component {
     // regular arrays are used to return multiple nodes
 
     return [
-      $("span", counter),
-      $("button", { onclick: this.onIncrement }, "increment"),
+      $("span", [counter]),
+      $("button", { onclick: this.onIncrement }, ["increment"]),
     ];
   }
 }
@@ -118,17 +118,17 @@ class Header extends Component {
     const { counter } = this.state; // internal data
 
     return $("header", [
-      $("h1", title),
-      $("span", counter),
-      $("button", { onclick: this.onIncrement }, "increment"),
+      $("h1", [title]),
+      $("span", [counter]),
+      $("button", { onclick: this.onIncrement }, ["increment"]),
     ]);
   }
 }
 
 function Footer({ year }) {
   return $("footer", [
-    $("span", `copyright, ${year}`),
-    $("a", { href: "https://example.com" }, "follow me"),
+    $("span", [`copyright, ${year}`]),
+    $("a", { href: "https://example.com" }, ["follow me"]),
   ]);
 }
 
@@ -204,7 +204,7 @@ class App extends Component {
   render() {
     const { counter } = this.state;
 
-    return $("span", counter);
+    return $("span", [counter]);
   }
 }
 

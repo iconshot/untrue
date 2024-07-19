@@ -7,5 +7,6 @@ export * from "./Wrapper";
 export * from "./Context";
 export * from "./Persistor";
 export * from "./Comparer";
+export * from "./Emitter";
 
 export { State } from "./Stateful";
