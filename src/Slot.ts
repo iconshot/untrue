@@ -30,7 +30,7 @@ export type ChildrenAny =
   | any[]
   | null
   | undefined
-  | Slot<Props>;
+  | Slot;
 
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>
