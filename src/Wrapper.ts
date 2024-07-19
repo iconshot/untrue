@@ -1,9 +1,9 @@
 import $, {
   Attributes,
   ClassComponent,
-  ContentComponent,
+  ComponentType,
   PropsNoChildren,
-} from "./Node";
+} from "./Slot";
 
 import { Component, Props } from "./Component";
 import { Comparer } from "./Comparer";
@@ -12,7 +12,7 @@ import { State } from "./Stateful";
 
 export class Wrapper {
   static wrapProps<A extends Props, B>(
-    Child: ContentComponent<A & B>,
+    Child: ComponentType<A & B>,
     closure: (props: PropsNoChildren<A>) => B | null
   ) {
     return function PropsWrapper({ children, ...props }: A) {
@@ -29,21 +29,21 @@ export class Wrapper {
   }
 
   static wrapContext<A extends Props, B>(
-    Child: ContentComponent<A & B>,
+    Child: ComponentType<A & B>,
     context: Context<State>,
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
   static wrapContext<A extends Props, B>(
-    Child: ContentComponent<A & B>,
+    Child: ComponentType<A & B>,
     contexts: Context<State>[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
   static wrapContext<A extends Props, B>(
-    Child: ContentComponent<A & B>,
+    Child: ComponentType<A & B>,
     tmpContexts: Context<State> | Context<State>[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>

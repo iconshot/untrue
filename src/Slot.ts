@@ -4,18 +4,18 @@ import { State } from "./Stateful";
 
 type DefaultProps = Props & { [key: string]: any };
 
-export type ContentComponent<K extends Props> =
+export type ComponentType<K extends Props> =
   | ClassComponent<K>
   | FunctionComponent<K>;
 
-export type ClassComponent<K extends Props> = new (...args: any[]) => Component<
+export type ClassComponent<K extends Props> = new (props: K) => Component<
   K,
   State
 >;
 
 export type FunctionComponent<K extends Props> = (props: K) => any;
 
-export type ContentType<K extends Props> = ContentComponent<K> | string;
+export type ContentType<K extends Props> = ComponentType<K> | string;
 
 export type PropsNoChildren<K extends Props> = Omit<K, "children">;
 
@@ -27,24 +27,24 @@ export type ChildrenAny = boolean | number | string | any[] | null | undefined;
 
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>
-): Node<K>;
+): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>
-): Node<K>;
+): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   children: ChildrenAny
-): Node<K>;
+): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>,
   children: ChildrenAny
-): Node<K>;
+): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   ...args: any[]
-): Node<K> {
+): Slot<K> {
   let attributes: Attributes<K> | null = null;
   let children: any[] = [];
 
@@ -56,7 +56,7 @@ function $<K extends Props = DefaultProps>(
     case 1: {
       if (Array.isArray(args[0])) {
         children = args[0];
-      } else if (args[0] instanceof Node) {
+      } else if (args[0] instanceof Slot) {
         children = [args[0]];
       } else if (args[0] !== null && typeof args[0] === "object") {
         attributes = args[0];
@@ -93,19 +93,19 @@ function $<K extends Props = DefaultProps>(
       typeof tmpContentType === "string"
     )
   ) {
-    throw new Error("Node type must be a Component class, function or string.");
+    throw new Error("Slot type must be a Component class, function or string.");
   }
 
   if (typeof attributes !== "object" || Array.isArray(attributes)) {
-    throw new Error("Node attributes must be object or null.");
+    throw new Error("Slot attributes must be object or null.");
   }
 
-  return new Node(contentType, attributes, children);
+  return new Slot(contentType, attributes, children);
 }
 
 export default $;
 
-export class Node<K extends Props = DefaultProps> {
+export class Slot<K extends Props = DefaultProps> {
   private contentType: ContentType<K> | null;
   private attributes: Attributes<K> | null;
   private children: any[];
@@ -117,7 +117,7 @@ export class Node<K extends Props = DefaultProps> {
     attributes: Attributes<K> | null,
     children: any[]
   ) {
-    children = Node.parseChildren(children);
+    children = Slot.parseChildren(children);
 
     const tmpContentType: any = contentType;
 
@@ -152,7 +152,7 @@ export class Node<K extends Props = DefaultProps> {
   setChildren(children: any) {
     let tmpChildren = Array.isArray(children) ? children : [children];
 
-    tmpChildren = Node.parseChildren(tmpChildren);
+    tmpChildren = Slot.parseChildren(tmpChildren);
 
     this.children = tmpChildren;
   }
@@ -213,11 +213,11 @@ export class Node<K extends Props = DefaultProps> {
   
   method necessary for cases when we have arrays inside children:
 
-    new Node("div", null, [["a", "b"], "text"])
+    new Slot("div", null, [["a", "b"], "text"])
 
   the output will be:
 
-    new Node("div", null, [new Node(null, null, ["a", "b"]), "text"])
+    new Slot("div", null, [new Slot(null, null, ["a", "b"]), "text"])
 
   this way Tree won't have a problem traversing the sub-tree
 
@@ -225,7 +225,7 @@ export class Node<K extends Props = DefaultProps> {
 
   static parseChildren(children: any[]) {
     return children.map((child) =>
-      Array.isArray(child) ? new Node(null, null, child) : child
+      Array.isArray(child) ? new Slot(null, null, child) : child
     );
   }
 }

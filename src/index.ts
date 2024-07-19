@@ -1,6 +1,6 @@
-export { default } from "./Node";
+export { default } from "./Slot";
 
-export * from "./Node";
+export * from "./Slot";
 export * from "./Component";
 export * from "./Ref";
 export * from "./Wrapper";

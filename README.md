@@ -27,7 +27,7 @@ import App from "./App";
 
 const tree = new Tree(document.body);
 
-// $ is a shorthand to represent nodes
+// $ is a shorthand to represent slots
 
 tree.mount($(App));
 ```
@@ -63,7 +63,7 @@ class App extends Component {
 
     const { counter } = this.state;
 
-    // regular arrays are used to return multiple nodes
+    // regular arrays are used to return multiple slots
 
     return [
       $("span", counter),
@@ -87,7 +87,7 @@ The output HTML will be:
 
 ### Modularity
 
-Components can be classes or functions and are used to group multiple nodes.
+Components can be classes or functions and are used to group multiple slots.
 
 ```js
 import $, { Component } from "untrue";
