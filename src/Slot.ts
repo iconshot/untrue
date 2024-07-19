@@ -23,7 +23,14 @@ export type Attributes<K extends Props> = PropsNoChildren<
   K & { key?: any; ref?: Ref<any> }
 >;
 
-export type ChildrenAny = boolean | number | string | any[] | null | undefined;
+export type ChildrenAny =
+  | boolean
+  | number
+  | string
+  | any[]
+  | null
+  | undefined
+  | Slot<Props>;
 
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>
