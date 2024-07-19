@@ -105,7 +105,7 @@ function $<K extends Props = DefaultProps>(
 
 export default $;
 
-export class Node<K extends Props> {
+export class Node<K extends Props = DefaultProps> {
   private contentType: ContentType<K> | null;
   private attributes: Attributes<K> | null;
   private children: any[];
