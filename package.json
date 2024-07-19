@@ -1,6 +1,6 @@
 {
   "name": "untrue",
-  "version": "4.7.1",
+  "version": "5.0.0",
   "description": "Render user interfaces.",
   "homepage": "https://untrue.dev",
   "repository": {
@@ -8,14 +8,21 @@
     "url": "https://github.com/iconshot/untrue.git"
   },
   "type": "module",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc"
+  },
   "keywords": [
     "untrue",
     "frontend",
     "ui"
   ],
   "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  },
   "dependencies": {
-    "eventemitter3": "^5.0.0"
+    "everemitter": "^1.1.0"
   }
 }

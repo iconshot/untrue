@@ -1,27 +1,27 @@
-import Stateful from "./Stateful.js";
+import { Stateful, State } from "./Stateful";
 
-class Component extends Stateful {
-  constructor(props = {}) {
+export interface Props {
+  children: any[];
+}
+
+export class Component<K extends Props, L extends State> extends Stateful<L> {
+  props: K;
+
+  prevProps: K | null = null;
+  nextProps: K | null = null;
+
+  mounted: boolean = false;
+
+  constructor(props: K) {
     super();
 
     this.props = props;
-
-    this.prevProps = null;
-    this.nextProps = null;
-
-    this.mounted = false;
   }
 
   // triggerRender will be called by a renderer abstraction
 
-  triggerRender(handler) {
-    try {
-      this.emit("render");
-    } catch (error) {
-      queueMicrotask(() => {
-        throw error;
-      });
-    }
+  triggerRender(handler: () => void) {
+    this.emit("render");
 
     this.off("rerender");
 
@@ -37,13 +37,7 @@ class Component extends Stateful {
   triggerMount() {
     this.mounted = true;
 
-    try {
-      this.emit("mount");
-    } catch (error) {
-      queueMicrotask(() => {
-        throw error;
-      });
-    }
+    this.emit("mount");
   }
 
   triggerUnmount() {
@@ -51,31 +45,29 @@ class Component extends Stateful {
 
     this.mounted = false;
 
-    try {
-      this.emit("unmount");
-    } catch (error) {
-      queueMicrotask(() => {
-        throw error;
-      });
-    }
+    this.emit("unmount");
   }
 
   // the component will receive a "rerender" handler via triggerRender
 
-  async startUpdate() {
+  async queueUpdate() {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout(() => this.emit("rerender"));
 
-    return await super.startUpdate();
+    return await super.queueUpdate();
   }
 
-  prepareUpdate(props) {
+  updateProps(props: K) {
     this.nextProps = props;
 
-    clearTimeout(this.updateTimeout);
+    this.startUpdate();
+  }
 
-    super.prepareUpdate();
+  startUpdate() {
+    super.startUpdate();
+
+    clearTimeout(this.updateTimeout);
   }
 
   replaceUpdate() {
@@ -90,7 +82,7 @@ class Component extends Stateful {
     this.nextProps = null;
   }
 
-  render() {
+  render(): any {
     return [];
   }
 }

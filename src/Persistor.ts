@@ -1,12 +1,54 @@
-import EventEmitter from "eventemitter3";
+import { Component, Props } from "./Component";
+import { Context } from "./Context";
+import { Emitter } from "./Emitter";
+import { ClassComponent } from "./Node";
+import { State } from "./Stateful";
 
-import Component from "./Component.js";
+export interface StorageInterface {
+  getItem(key: string): any | Promise<any>;
+  setItem(key: string, value: any): void | Promise<void>;
+}
 
-class Persistor extends EventEmitter {
+export type ContextsObject = { [key: string]: Context<any> };
+
+type StorageContent = { data: { [key: string]: any }; version: number };
+
+export type MigrationsObject = {
+  [key: number]: (value: { [key: string]: any }) => { [key: string]: any };
+};
+
+export type PersistorOptions = {
+  name?: string;
+  version?: number;
+  migrations?: MigrationsObject;
+};
+
+interface PersistorProviderProps extends Props {
+  loadingChildren?: any[];
+  errorChildren?: any[];
+}
+
+interface PersistorProviderState extends State {
+  loading: boolean;
+  error: boolean;
+}
+
+export class Persistor extends Emitter {
+  contexts: ContextsObject;
+  Storage: StorageInterface;
+
+  name: string;
+  version: number;
+  migrations: MigrationsObject;
+
+  Provider: ClassComponent<PersistorProviderProps>;
+
+  persistTimeout: number | undefined;
+
   constructor(
-    contexts,
-    Storage,
-    { name = "app", version = 0, migrations = {} } = {}
+    contexts: ContextsObject,
+    Storage: StorageInterface,
+    options?: PersistorOptions
   ) {
     super();
 
@@ -14,15 +56,17 @@ class Persistor extends EventEmitter {
 
     this.contexts = contexts;
 
-    this.name = name; // name of the Storage item
-    this.version = version; // content version of the Storage item
-
-    this.migrations = migrations;
+    this.name = options?.name ?? "app"; // name of the Storage item
+    this.version = options?.version ?? 0; // content version of the Storage item
+    this.migrations = options?.migrations ?? {};
 
     const self = this;
 
-    this.Provider = class PersistorProvider extends Component {
-      constructor(props) {
+    this.Provider = class PersistorProvider extends Component<
+      PersistorProviderProps,
+      PersistorProviderState
+    > {
+      constructor(props: PersistorProviderProps) {
         super(props);
 
         this.state = { loading: true, error: false };
@@ -43,32 +87,32 @@ class Persistor extends EventEmitter {
       }
 
       render() {
-        const { loadingNode = null, errorNode = null, children } = this.props;
+        const {
+          loadingChildren = null,
+          errorChildren = null,
+          children,
+        } = this.props;
 
         const { loading, error } = this.state;
 
         if (error) {
-          return errorNode;
+          return errorChildren;
         }
 
         if (loading) {
-          return loadingNode;
+          return loadingChildren;
         }
 
         return children;
       }
     };
-
-    // multiple consecutive updates in contexts will be batched in a single call to persist()
-
-    this.persistTimeout = null;
-
-    this.persistListener = () => {
-      clearTimeout(this.persistTimeout);
-
-      this.persistTimeout = setTimeout(() => this.persist());
-    };
   }
+
+  persistListener = () => {
+    clearTimeout(this.persistTimeout);
+
+    this.persistTimeout = setTimeout(() => this.persist());
+  };
 
   // init() is called when the Provider is mounted
 
@@ -77,7 +121,7 @@ class Persistor extends EventEmitter {
 
     const content = await this.read();
 
-    let data = {};
+    let data: StorageContent["data"] = {};
 
     if (content !== null) {
       data = this.migrate(content.data, content.version);
@@ -93,7 +137,9 @@ class Persistor extends EventEmitter {
       if (key in data) {
         // hydrate context with the corresponding data
 
-        context.hydrate(data[key]);
+        const value = data[key];
+
+        context.hydrate(value);
       }
     }
 
@@ -112,7 +158,7 @@ class Persistor extends EventEmitter {
   // generate the content for the Storage item and write it
 
   async persist() {
-    const content = { data: {}, version: this.version };
+    const content: StorageContent = { data: {}, version: this.version };
 
     for (const key in this.contexts) {
       const context = this.contexts[key];
@@ -124,18 +170,19 @@ class Persistor extends EventEmitter {
   }
 
   async read() {
-    // if found, content is read as a JSON
+    // if found, content is read as JSON
 
     const { Storage } = this;
 
-    const value = await Storage.getItem(this.name);
+    const value: string | null = await Storage.getItem(this.name);
 
-    const content = value !== null ? JSON.parse(value) : null;
+    const content: StorageContent | null =
+      value !== null ? JSON.parse(value) : null;
 
     return content;
   }
 
-  async write(content) {
+  async write(content: StorageContent) {
     // content is written as a json
 
     const { Storage } = this;
@@ -147,7 +194,7 @@ class Persistor extends EventEmitter {
 
   // get versions from current version (exclusive) to this.version (inclusive)
 
-  migrate(data, version) {
+  migrate(data: StorageContent["data"], version: number) {
     // already sorted by JS
 
     const keys = Object.keys(this.migrations)
@@ -163,5 +210,3 @@ class Persistor extends EventEmitter {
     }, data);
   }
 }
-
-export default Persistor;
