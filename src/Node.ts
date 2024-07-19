@@ -23,6 +23,8 @@ export type Attributes<K extends Props> = PropsNoChildren<
   K & { key?: any; ref?: Ref<any> }
 >;
 
+export type ChildrenAny = boolean | number | string | any[] | null | undefined;
+
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>
 ): Node<K>;
@@ -32,16 +34,16 @@ function $<K extends Props = DefaultProps>(
 ): Node<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
-  children: any[]
+  children: ChildrenAny
 ): Node<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>,
-  children: any[]
+  children: ChildrenAny
 ): Node<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
-  ...args
+  ...args: any[]
 ): Node<K> {
   let attributes: Attributes<K> | null = null;
   let children: any[] = [];
@@ -148,13 +150,11 @@ export class Node<K extends Props> {
   }
 
   setChildren(children: any) {
-    if (!Array.isArray(children)) {
-      children = [children];
-    }
+    let tmpChildren = Array.isArray(children) ? children : [children];
 
-    children = Node.parseChildren(children);
+    tmpChildren = Node.parseChildren(tmpChildren);
 
-    this.children = children;
+    this.children = tmpChildren;
   }
 
   isComponent() {
