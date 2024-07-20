@@ -20,7 +20,7 @@ export type ContentType<K extends Props> = ComponentType<K> | string;
 export type PropsNoChildren<K extends Props> = Omit<K, "children">;
 
 export type Attributes<K extends Props> = PropsNoChildren<
-  K & { key?: any; ref?: Ref<any> }
+  K & { key?: any; ref?: Ref<any> | null }
 >;
 
 export type ChildrenAny =
