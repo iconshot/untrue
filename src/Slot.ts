@@ -1,15 +1,15 @@
 import { Component, Props } from "./Component";
 import { Ref } from "./Ref";
 
-type DefaultProps = Props & { [key: string]: any };
+export type ClassComponent<K extends Props = Props> = new (
+  props: K
+) => Component<K>;
 
-export type ComponentType<K extends Props> =
+export type FunctionComponent<K extends Props = Props> = (props: K) => any;
+
+export type ComponentType<K extends Props = Props> =
   | ClassComponent<K>
   | FunctionComponent<K>;
-
-export type ClassComponent<K extends Props> = new (props: K) => Component<K>;
-
-export type FunctionComponent<K extends Props> = (props: K) => any;
 
 export type ContentType<K extends Props> = ComponentType<K> | string;
 
@@ -27,6 +27,8 @@ export type ChildrenAny =
   | null
   | undefined
   | Slot;
+
+type DefaultProps = Props & { [key: string]: any };
 
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>
