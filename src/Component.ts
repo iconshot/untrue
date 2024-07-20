@@ -4,7 +4,10 @@ export interface Props {
   children: any[];
 }
 
-export class Component<K extends Props, L extends State> extends Stateful<L> {
+export class Component<
+  K extends Props = Props,
+  L extends State = State
+> extends Stateful<L> {
   props: K;
 
   prevProps: K | null = null;

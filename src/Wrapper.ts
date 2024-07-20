@@ -8,7 +8,6 @@ import $, {
 import { Component, Props } from "./Component";
 import { Comparer } from "./Comparer";
 import { Context } from "./Context";
-import { State } from "./Stateful";
 
 export class Wrapper {
   static wrapProps<A extends Props, B>(
@@ -30,28 +29,28 @@ export class Wrapper {
 
   static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
-    context: Context<State>,
+    context: Context,
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
   static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
-    contexts: Context<State>[],
+    contexts: Context[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
   static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
-    tmpContexts: Context<State> | Context<State>[],
+    tmpContexts: Context | Context[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A> {
     const contexts = Array.isArray(tmpContexts) ? tmpContexts : [tmpContexts];
 
-    return class ContextWrapper extends Component<A, State> {
+    return class ContextWrapper extends Component<A> {
       result: B | null = null;
 
       compareTimeout: number | undefined;

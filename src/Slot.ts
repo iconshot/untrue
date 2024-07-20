@@ -1,6 +1,5 @@
 import { Component, Props } from "./Component";
 import { Ref } from "./Ref";
-import { State } from "./Stateful";
 
 type DefaultProps = Props & { [key: string]: any };
 
@@ -8,10 +7,7 @@ export type ComponentType<K extends Props> =
   | ClassComponent<K>
   | FunctionComponent<K>;
 
-export type ClassComponent<K extends Props> = new (props: K) => Component<
-  K,
-  State
->;
+export type ClassComponent<K extends Props> = new (props: K) => Component<K>;
 
 export type FunctionComponent<K extends Props> = (props: K) => any;
 

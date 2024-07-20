@@ -1,6 +1,6 @@
 import { Stateful, State } from "./Stateful";
 
-export class Context<L extends State> extends Stateful<L> {
+export class Context<L extends State = State> extends Stateful<L> {
   // methods used by Persistor
 
   persist(): any {
