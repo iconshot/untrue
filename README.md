@@ -18,7 +18,7 @@ Native app development coming soon.
 
 You can add Untrue to any part of your page.
 
-```js
+```ts
 import $ from "untrue";
 
 import { Tree } from "@untrue/web";
@@ -42,11 +42,15 @@ More on `App` in the next section.
 
 A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
-```js
-import $, { Component } from "untrue";
+```ts
+import $, { Component, Props, State } from "untrue";
 
-class App extends Component {
-  constructor(props) {
+interface AppState extends State {
+  counter: number;
+}
+
+class App extends Component<Props, AppState> {
+  constructor(props: Props) {
     super(props);
 
     this.state = { counter: 0 };
@@ -89,8 +93,8 @@ The output HTML will be:
 
 Components can be classes or functions and are used to group multiple slots.
 
-```js
-import $, { Component } from "untrue";
+```ts
+import $, { Component, Props, State } from "untrue";
 
 function App() {
   return [
@@ -99,8 +103,16 @@ function App() {
   ];
 }
 
-class Header extends Component {
-  constructor(props) {
+interface HeaderProps extends Props {
+  title: string;
+}
+
+interface HeaderState extends State {
+  counter: number;
+}
+
+class Header extends Component<HeaderProps, HeaderState> {
+  constructor(props: HeaderProps) {
     super(props);
 
     this.state = { counter: 0 };
@@ -125,7 +137,11 @@ class Header extends Component {
   }
 }
 
-function Footer({ year }) {
+interface FooterProps extends Props {
+  year: number;
+}
+
+function Footer({ year }: FooterProps) {
   return $("footer", [
     $("span", `copyright, ${year}`),
     $("a", { href: "https://example.com" }, "follow me"),
@@ -160,16 +176,20 @@ The output HTML will be:
 
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
-```js
-import $, { Component } from "untrue";
+```ts
+import $, { Component, Props, State } from "untrue";
 
-class App extends Component {
-  constructor(props) {
+interface TimerState extends State {
+  counter: number;
+}
+
+class Timer extends Component<Props, TimerState> {
+  interval: number | undefined;
+
+  constructor(props: Props) {
     super(props);
 
     this.state = { counter: 0 };
-
-    this.interval = null;
 
     // start interval on mount
 
@@ -178,7 +198,7 @@ class App extends Component {
         const { counter } = this.state;
 
         this.updateState({ counter: counter + 1 });
-      }, 5000);
+      }, 1000);
     });
 
     // clear interval on unmount
@@ -193,7 +213,7 @@ class App extends Component {
       // this.props and this.prevProps are also available
 
       const { counter } = this.state;
-      const { counter: prevCounter } = this.prevState;
+      const { counter: prevCounter } = this.prevState!;
 
       if (counter !== prevCounter) {
         console.log("Counter has been updated.", { counter, prevCounter });
@@ -208,13 +228,47 @@ class App extends Component {
   }
 }
 
+interface AppState extends State {
+  running: boolean;
+}
+
+class App extends Component<Props, AppState> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { running: false };
+  }
+
+  onClick = () => {
+    const { running } = this.state;
+
+    this.updateState({ running: !running });
+  };
+
+  render() {
+    const { running } = this.state;
+
+    return [
+      $(
+        "button",
+        { onclick: this.onClick },
+        running ? "end timer" : "start timer"
+      ),
+      $("br"),
+      running ? $(Timer) : null,
+    ];
+  }
+}
+
 export default App;
 ```
 
-The output HTML will be:
+After the button click, the output HTML will be:
 
 ```html
+<button>end timer</button>
+<br />
 <span>0</span>
 ```
 
-A `log` will happen every 5 seconds because `interval` updates `counter` on every call.
+A `console.log` happens every second because `interval` updates `counter` on every call.
