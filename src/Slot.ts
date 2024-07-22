@@ -11,7 +11,7 @@ export type ComponentType<K extends Props = Props> =
   | ClassComponent<K>
   | FunctionComponent<K>;
 
-export type ContentType<K extends Props> = ComponentType<K> | string;
+export type ContentType<K extends Props> = ComponentType<K> | string | null;
 
 export type PropsNoChildren<K extends Props> = Omit<K, "children">;
 
@@ -88,9 +88,8 @@ function $<K extends Props = DefaultProps>(
     /^class\s/.test(Function.prototype.toString.call(tmpContentType));
 
   if (
-    tmpContentType === null ||
-    tmpContentType === undefined ||
     !(
+      tmpContentType === null ||
       (isClass &&
         (tmpContentType.prototype === Component ||
           tmpContentType.prototype instanceof Component)) ||
@@ -98,11 +97,13 @@ function $<K extends Props = DefaultProps>(
       typeof tmpContentType === "string"
     )
   ) {
-    throw new Error("Slot type must be a Component class, function or string.");
+    throw new Error(
+      "Content type must be a Component class, function, string or null."
+    );
   }
 
   if (typeof attributes !== "object" || Array.isArray(attributes)) {
-    throw new Error("Slot attributes must be object or null.");
+    throw new Error("Attributes must be object or null.");
   }
 
   return new Slot(contentType, attributes, children);
@@ -111,14 +112,14 @@ function $<K extends Props = DefaultProps>(
 export default $;
 
 export class Slot<K extends Props = DefaultProps> {
-  private contentType: ContentType<K> | null;
+  private contentType: ContentType<K>;
   private attributes: Attributes<K> | null;
   private children: any[];
 
   private propsChildren: any[] | null = null;
 
   constructor(
-    contentType: ContentType<K> | null,
+    contentType: ContentType<K>,
     attributes: Attributes<K> | null,
     children: any[]
   ) {
