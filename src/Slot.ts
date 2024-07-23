@@ -19,7 +19,7 @@ export type Attributes<K extends Props> = PropsNoChildren<
   K & { key?: any; ref?: Ref<any> | null }
 >;
 
-export type ChildrenAny =
+export type Children =
   | boolean
   | number
   | string
@@ -39,12 +39,12 @@ function $<K extends Props = DefaultProps>(
 ): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
-  children: ChildrenAny
+  children: Children
 ): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>,
-  children: ChildrenAny
+  children: Children
 ): Slot<K>;
 function $<K extends Props = DefaultProps>(
   contentType: ContentType<K>,

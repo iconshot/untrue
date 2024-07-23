@@ -1,7 +1,7 @@
 import { Component, Props } from "./Component";
 import { Context } from "./Context";
 import { Emitter } from "./Emitter";
-import { ClassComponent } from "./Slot";
+import { Children, ClassComponent } from "./Slot";
 import { State } from "./Stateful";
 
 export interface StorageInterface {
@@ -24,8 +24,8 @@ export type PersistorOptions = {
 };
 
 export interface PersistorProviderProps extends Props {
-  loadingChildren?: any[];
-  errorChildren?: any[];
+  loadingChildren?: Children;
+  errorChildren?: Children;
 }
 
 interface PersistorProviderState extends State {
