@@ -23,7 +23,7 @@ export type PersistorOptions = {
   migrations?: MigrationsObject;
 };
 
-interface PersistorProviderProps extends Props {
+export interface PersistorProviderProps extends Props {
   loadingChildren?: any[];
   errorChildren?: any[];
 }
