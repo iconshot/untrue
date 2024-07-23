@@ -34,16 +34,16 @@ interface PersistorProviderState extends State {
 }
 
 export class Persistor extends Emitter {
-  contexts: ContextsObject;
-  Storage: StorageInterface;
+  private contexts: ContextsObject;
+  private Storage: StorageInterface;
 
-  name: string;
-  version: number;
-  migrations: MigrationsObject;
+  private name: string;
+  private version: number;
+  private migrations: MigrationsObject;
 
   Provider: ClassComponent<PersistorProviderProps>;
 
-  persistTimeout: number | undefined;
+  private persistTimeout: number | undefined;
 
   constructor(
     contexts: ContextsObject,
@@ -73,18 +73,20 @@ export class Persistor extends Emitter {
 
         // init the Persistor on mount
 
-        this.on("mount", async () => {
-          try {
-            await self.init();
-          } catch (error) {
-            this.updateState({ error: true });
-
-            throw error;
-          } finally {
-            this.updateState({ loading: false });
-          }
-        });
+        this.on("mount", this.handleMount);
       }
+
+      private handleMount = async () => {
+        try {
+          await self.init();
+        } catch (error) {
+          this.updateState({ error: true });
+
+          throw error;
+        } finally {
+          this.updateState({ loading: false });
+        }
+      };
 
       render() {
         const {
@@ -108,7 +110,7 @@ export class Persistor extends Emitter {
     };
   }
 
-  persistListener = () => {
+  private persistListener = () => {
     clearTimeout(this.persistTimeout);
 
     this.persistTimeout = setTimeout(() => this.persist());
@@ -157,7 +159,7 @@ export class Persistor extends Emitter {
 
   // generate the content for the Storage item and write it
 
-  async persist() {
+  private async persist() {
     const content: StorageContent = { data: {}, version: this.version };
 
     for (const key in this.contexts) {
@@ -169,7 +171,7 @@ export class Persistor extends Emitter {
     await this.write(content);
   }
 
-  async read() {
+  private async read() {
     // if found, content is read as JSON
 
     const { Storage } = this;
@@ -182,7 +184,7 @@ export class Persistor extends Emitter {
     return content;
   }
 
-  async write(content: StorageContent) {
+  private async write(content: StorageContent) {
     // content is written as a json
 
     const { Storage } = this;
@@ -194,7 +196,7 @@ export class Persistor extends Emitter {
 
   // get versions from current version (exclusive) to this.version (inclusive)
 
-  migrate(data: StorageContent["data"], version: number) {
+  private migrate(data: StorageContent["data"], version: number) {
     // already sorted by JS
 
     const keys = Object.keys(this.migrations)

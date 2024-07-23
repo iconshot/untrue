@@ -8,12 +8,12 @@ export class Component<
   K extends Props = Props,
   L extends State = State
 > extends Stateful<L> {
-  props: K;
+  protected props: K;
 
-  prevProps: K | null = null;
-  nextProps: K | null = null;
+  protected prevProps: K | null = null;
+  protected nextProps: K | null = null;
 
-  mounted: boolean = false;
+  protected mounted: boolean = false;
 
   constructor(props: K) {
     super();
@@ -37,7 +37,7 @@ export class Component<
     }
   }
 
-  triggerMount() {
+  protected triggerMount() {
     this.mounted = true;
 
     this.emit("mount");
@@ -53,7 +53,7 @@ export class Component<
 
   // the component will receive a "rerender" handler via triggerRender
 
-  async queueUpdate() {
+  protected async queueUpdate() {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout(() => this.emit("rerender"));
@@ -67,13 +67,13 @@ export class Component<
     this.startUpdate();
   }
 
-  startUpdate() {
+  protected startUpdate() {
     super.startUpdate();
 
     clearTimeout(this.updateTimeout);
   }
 
-  replaceUpdate() {
+  protected replaceUpdate() {
     super.replaceUpdate();
 
     this.prevProps = this.props;

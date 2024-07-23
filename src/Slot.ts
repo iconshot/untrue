@@ -229,7 +229,7 @@ export class Slot<K extends Props = DefaultProps> {
 
   */
 
-  static parseChildren(children: any[]) {
+  private static parseChildren(children: any[]) {
     return children.map((child) =>
       Array.isArray(child) ? new Slot(null, null, child) : child
     );

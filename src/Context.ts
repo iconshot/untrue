@@ -15,7 +15,7 @@ export class Context<L extends State = State> extends Stateful<L> {
 
   // override Stateful methods
 
-  async queueUpdate() {
+  protected async queueUpdate() {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout(() => this.startUpdate());
@@ -23,7 +23,7 @@ export class Context<L extends State = State> extends Stateful<L> {
     return await super.queueUpdate();
   }
 
-  startUpdate() {
+  protected startUpdate() {
     super.startUpdate();
 
     this.triggerUpdate();

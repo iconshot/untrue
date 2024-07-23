@@ -51,30 +51,30 @@ export class Wrapper {
     const contexts = Array.isArray(tmpContexts) ? tmpContexts : [tmpContexts];
 
     return class ContextWrapper extends Component<A> {
-      result: B | null = null;
+      private result: B | null = null;
 
-      compareTimeout: number | undefined;
+      private compareTimeout: number | undefined;
 
       constructor(props: A) {
         super(props);
 
-        this.on("mount", this.handleMountContext);
-        this.on("unmount", this.handleUnmountContext);
+        this.on("mount", this.handleMount);
+        this.on("unmount", this.handleUnmount);
       }
 
-      compareListener = () => {
+      private compareListener = () => {
         clearTimeout(this.compareTimeout);
 
         this.compareTimeout = setTimeout(() => this.compare());
       };
 
-      handleMountContext = () => {
+      private handleMount = () => {
         for (const context of contexts) {
           context.on("update", this.compareListener);
         }
       };
 
-      handleUnmountContext = () => {
+      private handleUnmount = () => {
         for (const context of contexts) {
           context.off("update", this.compareListener);
         }
@@ -82,7 +82,7 @@ export class Wrapper {
 
       // returned result will be merged with props and passed to Child
 
-      select() {
+      private select() {
         return selectors.reduce<Partial<B> | null>((result, selector) => {
           if (result === null) {
             return null;
@@ -104,7 +104,7 @@ export class Wrapper {
         }, {}) as B | null;
       }
 
-      compare() {
+      private compare() {
         const result = this.select();
 
         const equal = Comparer.compare(result, this.result);
