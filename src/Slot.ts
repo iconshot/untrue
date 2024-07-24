@@ -231,14 +231,23 @@ export class Slot<K extends Props = DefaultProps> {
 
   private static parseChildren(children: any[]) {
     return children.map((child, i) => {
-      if (child instanceof Slot && child.getKey() !== null) {
-        const index = children.findIndex(
-          (tmpChild) =>
-            tmpChild instanceof Slot && tmpChild.getKey() === child.getKey()
-        );
+      if (child instanceof Slot) {
+        const key = child.getKey();
 
-        if (index !== i) {
-          throw new Error(`Repeated keys: ${child.getKey()}`);
+        if (key !== null) {
+          const index = children.findIndex((tmpChild) => {
+            if (!(tmpChild instanceof Slot)) {
+              return false;
+            }
+
+            const tmpKey = tmpChild.getKey();
+
+            return key === tmpKey;
+          });
+
+          if (index !== i) {
+            throw new Error(`Repeated keys: ${key}`);
+          }
         }
       }
 
