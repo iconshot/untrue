@@ -5,8 +5,8 @@ import { Children, ClassComponent } from "./Slot";
 import { State } from "./Stateful";
 
 export interface StorageInterface {
-  getItem(key: string): any | Promise<any>;
-  setItem(key: string, value: any): void | Promise<void>;
+  getItem(key: string): (string | null) | Promise<string | null>;
+  setItem(key: string, value: string): void | Promise<void>;
 }
 
 export type ContextsObject = { [key: string]: Context<any> };
