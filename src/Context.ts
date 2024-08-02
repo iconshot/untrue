@@ -9,21 +9,23 @@ export class Context<L extends State = State> extends Stateful<L> {
     return value;
   }
 
-  hydrate(value: any) {
+  hydrate(value: any): void {
     this.state = value;
   }
 
   // override Stateful methods
 
-  protected async queueUpdate() {
+  protected async queueUpdate(): Promise<void> {
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout(() => this.startUpdate());
+    this.updateTimeout = setTimeout((): void => {
+      this.startUpdate();
+    });
 
     return await super.queueUpdate();
   }
 
-  protected startUpdate() {
+  protected startUpdate(): void {
     super.startUpdate();
 
     this.triggerUpdate();

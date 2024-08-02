@@ -1,4 +1,5 @@
 import $, {
+  Slot,
   Attributes,
   ClassComponent,
   ComponentType,
@@ -13,7 +14,7 @@ export class Wrapper {
   static wrapProps<A extends Props, B>(
     Child: ComponentType<A & B>,
     closure: (props: PropsNoChildren<A>) => B | null
-  ) {
+  ): (props: A) => Slot<A & B> | null {
     return function PropsWrapper({ children, ...props }: A) {
       const result = closure(props);
 
@@ -62,19 +63,21 @@ export class Wrapper {
         this.on("unmount", this.handleUnmount);
       }
 
-      private compareListener = () => {
+      private compareListener = (): void => {
         clearTimeout(this.compareTimeout);
 
-        this.compareTimeout = setTimeout(() => this.compare());
+        this.compareTimeout = setTimeout((): void => {
+          this.compare();
+        });
       };
 
-      private handleMount = () => {
+      private handleMount = (): void => {
         for (const context of contexts) {
           context.on("update", this.compareListener);
         }
       };
 
-      private handleUnmount = () => {
+      private handleUnmount = (): void => {
         for (const context of contexts) {
           context.off("update", this.compareListener);
         }
@@ -82,29 +85,32 @@ export class Wrapper {
 
       // returned result will be merged with props and passed to Child
 
-      private select() {
-        return selectors.reduce<Partial<B> | null>((result, selector) => {
-          if (result === null) {
-            return null;
-          }
+      private select(): B | null {
+        return selectors.reduce<Partial<B> | null>(
+          (result, selector): Partial<B> | null => {
+            if (result === null) {
+              return null;
+            }
 
-          const { children, ...props } = this.props;
+            const { children, ...props } = this.props;
 
-          const tmpProps = { ...props, ...result };
+            const tmpProps = { ...props, ...result };
 
-          const tmpResult = selector(tmpProps);
+            const tmpResult = selector(tmpProps);
 
-          if (tmpResult === null) {
-            return null;
-          }
+            if (tmpResult === null) {
+              return null;
+            }
 
-          const mergedResult = { ...result, ...tmpResult };
+            const mergedResult = { ...result, ...tmpResult };
 
-          return mergedResult;
-        }, {}) as B | null;
+            return mergedResult;
+          },
+          {}
+        ) as B | null;
       }
 
-      private compare() {
+      private compare(): void {
         const result = this.select();
 
         const equal = Comparer.compare(result, this.result);
@@ -116,7 +122,7 @@ export class Wrapper {
         this.update();
       }
 
-      render() {
+      render(): any {
         const { children, ...props } = this.props;
 
         this.result = this.select(); // it handles both update() calls and new props

@@ -3,7 +3,7 @@ import { Emitter } from "./Emitter";
 
 export interface State {}
 
-type Resolve = (value: unknown) => void;
+type UpdateResolver = (value: void) => void;
 
 export class Stateful<L extends State> extends Emitter {
   protected state: L;
@@ -13,21 +13,21 @@ export class Stateful<L extends State> extends Emitter {
 
   protected updateTimeout: number | undefined;
 
-  protected updateResolvers: Resolve[] = [];
+  protected updateResolvers: UpdateResolver[] = [];
 
   getState(): L {
     return this.state;
   }
 
-  protected triggerUpdate() {
+  protected triggerUpdate(): void {
     this.emit("update");
   }
 
-  protected async update() {
+  protected async update(): Promise<void> {
     return await this.queueUpdate();
   }
 
-  protected async updateState(state: Partial<L>) {
+  protected async updateState(state: Partial<L>): Promise<void> {
     let currentState = { ...this.state };
 
     if (this.nextState !== null) {
@@ -49,18 +49,18 @@ export class Stateful<L extends State> extends Emitter {
     return await this.queueUpdate();
   }
 
-  protected queueUpdate() {
-    return new Promise((resolve) => {
+  protected queueUpdate(): Promise<void> {
+    return new Promise<void>((resolve): void => {
       this.updateResolvers.push(resolve);
     });
   }
 
-  protected startUpdate() {
+  protected startUpdate(): void {
     this.replaceUpdate();
     this.resolveUpdate();
   }
 
-  protected replaceUpdate() {
+  protected replaceUpdate(): void {
     this.prevState = this.state;
 
     if (this.nextState !== null) {
@@ -70,8 +70,10 @@ export class Stateful<L extends State> extends Emitter {
     this.nextState = null;
   }
 
-  protected resolveUpdate() {
-    this.updateResolvers.forEach((resolve) => resolve(undefined));
+  protected resolveUpdate(): void {
+    this.updateResolvers.forEach((resolve): void => {
+      resolve();
+    });
 
     this.updateResolvers = [];
   }

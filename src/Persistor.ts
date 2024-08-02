@@ -76,7 +76,7 @@ export class Persistor extends Emitter {
         this.on("mount", this.handleMount);
       }
 
-      private handleMount = async () => {
+      private handleMount = async (): Promise<void> => {
         try {
           await self.init();
         } catch (error) {
@@ -88,7 +88,7 @@ export class Persistor extends Emitter {
         }
       };
 
-      render() {
+      render(): any {
         const {
           loadingChildren = null,
           errorChildren = null,
@@ -110,15 +110,17 @@ export class Persistor extends Emitter {
     };
   }
 
-  private persistListener = () => {
+  private persistListener = (): void => {
     clearTimeout(this.persistTimeout);
 
-    this.persistTimeout = setTimeout(() => this.persist());
+    this.persistTimeout = setTimeout((): void => {
+      this.persist();
+    });
   };
 
   // init() is called when the Provider is mounted
 
-  async init() {
+  async init(): Promise<void> {
     // content can be null when there's not an item found with the name this.name in Storage
 
     const content = await this.read();
@@ -159,7 +161,7 @@ export class Persistor extends Emitter {
 
   // generate the content for the Storage item and write it
 
-  private async persist() {
+  private async persist(): Promise<void> {
     const content: StorageContent = { data: {}, version: this.version };
 
     for (const key in this.contexts) {
@@ -171,7 +173,7 @@ export class Persistor extends Emitter {
     await this.write(content);
   }
 
-  private async read() {
+  private async read(): Promise<StorageContent | null> {
     // if found, content is read as JSON
 
     const { Storage } = this;
@@ -184,7 +186,7 @@ export class Persistor extends Emitter {
     return content;
   }
 
-  private async write(content: StorageContent) {
+  private async write(content: StorageContent): Promise<void> {
     // content is written as a json
 
     const { Storage } = this;
@@ -196,19 +198,32 @@ export class Persistor extends Emitter {
 
   // get versions from current version (exclusive) to this.version (inclusive)
 
-  private migrate(data: StorageContent["data"], version: number) {
+  private migrate(
+    data: StorageContent["data"],
+    version: number
+  ): {
+    [key: string]: any;
+  } {
     // already sorted by JS
 
     const keys = Object.keys(this.migrations)
-      .map((key) => parseInt(key))
-      .filter((key) => key > version && key <= this.version);
+      .map((key): number => parseInt(key))
+      .filter((key): boolean => key > version && key <= this.version);
 
     // migrate data
 
-    return keys.reduce((value, key) => {
-      const migrate = this.migrations[key];
+    return keys.reduce(
+      (
+        value,
+        key
+      ): {
+        [key: string]: any;
+      } => {
+        const migrate = this.migrations[key];
 
-      return migrate(value);
-    }, data);
+        return migrate(value);
+      },
+      data
+    );
   }
 }

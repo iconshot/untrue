@@ -143,19 +143,19 @@ export class Slot<K extends Props = DefaultProps> {
     this.children = children;
   }
 
-  getContentType() {
+  getContentType(): ContentType<K> {
     return this.contentType;
   }
 
-  getAttributes() {
+  getAttributes(): Attributes<K> | null {
     return this.attributes;
   }
 
-  getChildren() {
+  getChildren(): any[] {
     return this.children;
   }
 
-  setChildren(children: any) {
+  setChildren(children: any): void {
     let tmpChildren = Array.isArray(children) ? children : [children];
 
     tmpChildren = Slot.parseChildren(tmpChildren);
@@ -163,7 +163,7 @@ export class Slot<K extends Props = DefaultProps> {
     this.children = tmpChildren;
   }
 
-  isComponent() {
+  isComponent(): boolean {
     const tmpContentType: any = this.contentType;
 
     return (
@@ -173,19 +173,19 @@ export class Slot<K extends Props = DefaultProps> {
     );
   }
 
-  isFunction() {
+  isFunction(): boolean {
     return typeof this.contentType === "function" && !this.isComponent();
   }
 
-  isElement() {
+  isElement(): boolean {
     return typeof this.contentType === "string";
   }
 
-  isNull() {
+  isNull(): boolean {
     return this.contentType === null;
   }
 
-  getKey() {
+  getKey(): any {
     if (this.attributes === null) {
       return null;
     }
@@ -195,7 +195,7 @@ export class Slot<K extends Props = DefaultProps> {
     return key;
   }
 
-  getRef() {
+  getRef(): Ref<any> | null {
     if (this.attributes === null) {
       return null;
     }
@@ -229,13 +229,13 @@ export class Slot<K extends Props = DefaultProps> {
 
   */
 
-  private static parseChildren(children: any[]) {
-    return children.map((child, i) => {
+  private static parseChildren(children: any[]): any[] {
+    return children.map((child, i): any => {
       if (child instanceof Slot) {
         const key = child.getKey();
 
         if (key !== null) {
-          const index = children.findIndex((tmpChild) => {
+          const index = children.findIndex((tmpChild): boolean => {
             if (!(tmpChild instanceof Slot)) {
               return false;
             }

@@ -23,7 +23,7 @@ export class Component<
 
   // triggerRender will be called by a renderer abstraction
 
-  triggerRender(handler: () => void) {
+  triggerRender(handler: () => void): void {
     this.emit("render");
 
     this.off("rerender");
@@ -37,13 +37,13 @@ export class Component<
     }
   }
 
-  protected triggerMount() {
+  protected triggerMount(): void {
     this.mounted = true;
 
     this.emit("mount");
   }
 
-  triggerUnmount() {
+  triggerUnmount(): void {
     this.off("rerender");
 
     this.mounted = false;
@@ -53,27 +53,29 @@ export class Component<
 
   // the component will receive a "rerender" handler via triggerRender
 
-  protected async queueUpdate() {
+  protected async queueUpdate(): Promise<void> {
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout(() => this.emit("rerender"));
+    this.updateTimeout = setTimeout((): void => {
+      this.emit("rerender");
+    });
 
     return await super.queueUpdate();
   }
 
-  updateProps(props: K) {
+  updateProps(props: K): void {
     this.nextProps = props;
 
     this.startUpdate();
   }
 
-  protected startUpdate() {
+  protected startUpdate(): void {
     super.startUpdate();
 
     clearTimeout(this.updateTimeout);
   }
 
-  protected replaceUpdate() {
+  protected replaceUpdate(): void {
     super.replaceUpdate();
 
     this.prevProps = this.props;

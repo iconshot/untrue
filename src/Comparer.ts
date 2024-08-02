@@ -52,7 +52,7 @@ export class Comparer {
         return false;
       }
 
-      return a.every((element, i) => this.compare(element, b[i]));
+      return a.every((element, i): boolean => this.compare(element, b[i]));
     }
 
     // for objects, compare properties deeply
@@ -77,7 +77,9 @@ export class Comparer {
         return false;
       }
 
-      return aKeys.every((key) => key in b && this.compare(a[key], b[key]));
+      return aKeys.every(
+        (key): boolean => key in b && this.compare(a[key], b[key])
+      );
     }
 
     // for anything else, check equality
