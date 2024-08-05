@@ -1,13 +1,20 @@
-import { Stateful, State } from "./Stateful";
+import { Stateful, State, StatefulSignatures } from "./Stateful";
 
 export interface Props {
   children: any[];
 }
 
+type ComponentSignatures = StatefulSignatures & {
+  render: () => any;
+  mount: () => any;
+  unmount: () => any;
+  rerender: () => any;
+};
+
 export class Component<
   K extends Props = Props,
   L extends State = State
-> extends Stateful<L> {
+> extends Stateful<L, ComponentSignatures> {
   protected props: K;
 
   protected prevProps: K | null = null;

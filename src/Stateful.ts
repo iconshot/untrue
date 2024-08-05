@@ -3,9 +3,16 @@ import { Emitter } from "./Emitter";
 
 export interface State {}
 
+export type StatefulSignatures = {
+  update: () => any;
+};
+
 type UpdateResolver = (value: void) => void;
 
-export class Stateful<L extends State> extends Emitter {
+export class Stateful<
+  L extends State,
+  M extends StatefulSignatures
+> extends Emitter<M> {
   protected state: L;
 
   protected prevState: L | null = null;
@@ -20,7 +27,9 @@ export class Stateful<L extends State> extends Emitter {
   }
 
   protected triggerUpdate(): void {
-    this.emit("update");
+    const self: Stateful<State, StatefulSignatures> = this;
+
+    self.emit("update");
   }
 
   protected async update(): Promise<void> {

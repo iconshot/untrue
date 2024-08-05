@@ -33,7 +33,11 @@ interface PersistorProviderState extends State {
   error: boolean;
 }
 
-export class Persistor extends Emitter {
+type PersistorSignatures = {
+  init: () => any;
+};
+
+export class Persistor extends Emitter<PersistorSignatures> {
   private contexts: ContextsObject;
   private Storage: StorageInterface;
 
