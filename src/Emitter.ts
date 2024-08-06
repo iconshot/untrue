@@ -1,6 +1,8 @@
 import { EverEmitter, SignatureRecord, OnErrorClosure } from "everemitter";
 
-export class Emitter<M extends SignatureRecord> extends EverEmitter<M> {
+export class Emitter<
+  M extends SignatureRecord = SignatureRecord
+> extends EverEmitter<M> {
   constructor() {
     super({
       onError: (error, name, ...args): void => {
