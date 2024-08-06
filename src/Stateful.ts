@@ -27,7 +27,7 @@ export class Stateful<
   }
 
   protected triggerUpdate(): void {
-    const self: Stateful<State, StatefulSignatures> = this;
+    const self = this as Stateful<L, StatefulSignatures>;
 
     self.emit("update");
   }
