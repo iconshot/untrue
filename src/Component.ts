@@ -8,6 +8,9 @@ type ComponentSignatures = StatefulSignatures & {
   render: () => any;
   mount: () => any;
   unmount: () => any;
+};
+
+type PrivateComponentSignatures = StatefulSignatures & {
   rerender: () => any;
 };
 
@@ -31,11 +34,13 @@ export class Component<
   // triggerRender will be called by a renderer abstraction
 
   triggerRender(handler: () => void): void {
+    const self = this as Stateful<L, PrivateComponentSignatures>;
+
     this.emit("render");
 
-    this.off("rerender");
+    self.off("rerender");
 
-    this.on("rerender", handler);
+    self.on("rerender", handler);
 
     if (!this.mounted) {
       this.triggerMount();
@@ -51,7 +56,9 @@ export class Component<
   }
 
   triggerUnmount(): void {
-    this.off("rerender");
+    const self = this as Stateful<L, PrivateComponentSignatures>;
+
+    self.off("rerender");
 
     this.mounted = false;
 
@@ -61,10 +68,12 @@ export class Component<
   // the component will receive a "rerender" handler via triggerRender
 
   protected async queueUpdate(): Promise<void> {
+    const self = this as Stateful<L, PrivateComponentSignatures>;
+
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout((): void => {
-      this.emit("rerender");
+      self.emit("rerender");
     });
 
     return await super.queueUpdate();
