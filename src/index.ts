@@ -9,4 +9,7 @@ export * from "./Persistor";
 export * from "./Comparer";
 export * from "./Emitter";
 
+export * from "./Animation/Animation";
+export * from "./Animation/Easing";
+
 export { State } from "./Stateful";

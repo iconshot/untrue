@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "declaration": true,
+    "types": [],
     "removeComments": true
   }
 }
