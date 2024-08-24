@@ -2,7 +2,7 @@ import { Emitter } from "../Emitter";
 
 import { Animation } from "./Animation";
 
-import { Frame } from "./Frame";
+import { AnimationFrame } from "./AnimationFrame";
 
 type TransitionSignatures = {
   start: () => void;
@@ -66,10 +66,10 @@ export class Transition extends Emitter<TransitionSignatures> {
         return;
       }
 
-      this.frame = Frame.request(callback);
+      this.frame = AnimationFrame.request(callback);
     };
 
-    this.frame = Frame.request(callback);
+    this.frame = AnimationFrame.request(callback);
 
     this.emit("start");
   }
@@ -79,7 +79,7 @@ export class Transition extends Emitter<TransitionSignatures> {
       return;
     }
 
-    Frame.cancel(this.frame);
+    AnimationFrame.cancel(this.frame);
 
     this.emit("pause");
   }
@@ -91,7 +91,7 @@ export class Transition extends Emitter<TransitionSignatures> {
 
     this.canceled = true;
 
-    Frame.cancel(this.frame);
+    AnimationFrame.cancel(this.frame);
 
     this.emit("cancel");
   }

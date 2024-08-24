@@ -11,5 +11,6 @@ export * from "./Emitter";
 
 export * from "./Animation/Animation";
 export * from "./Animation/Easing";
+export * from "./Animation/AnimationFrame";
 
 export { State } from "./Stateful";

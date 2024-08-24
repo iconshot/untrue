@@ -1,4 +1,4 @@
-export class Frame {
+export class AnimationFrame {
   static request(callback: (time: number) => void): number {
     if (typeof requestAnimationFrame !== "undefined") {
       return requestAnimationFrame(callback);
