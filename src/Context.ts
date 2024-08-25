@@ -6,30 +6,24 @@ export class Context<L extends State = State> extends Stateful<
 > {
   // methods used by Persistor
 
-  persist(): any {
+  public persist(): any {
     const value = this.state;
 
     return value;
   }
 
-  hydrate(value: any): void {
+  public hydrate(value: any): void {
     this.state = value;
   }
 
   // override Stateful methods
 
-  protected async queueUpdate(): Promise<void> {
-    clearTimeout(this.updateTimeout);
-
-    this.updateTimeout = setTimeout((): void => {
-      this.startUpdate();
-    });
-
-    return await super.queueUpdate();
+  protected async startUpdate(): Promise<void> {
+    this.performUpdate();
   }
 
-  protected startUpdate(): void {
-    super.startUpdate();
+  protected performUpdate(): void {
+    super.performUpdate();
 
     this.triggerUpdate();
   }

@@ -143,19 +143,19 @@ export class Slot<K extends Props = DefaultProps> {
     this.children = children;
   }
 
-  getContentType(): ContentType<K> {
+  public getContentType(): ContentType<K> {
     return this.contentType;
   }
 
-  getAttributes(): Attributes<K> | null {
+  public getAttributes(): Attributes<K> | null {
     return this.attributes;
   }
 
-  getChildren(): any[] {
+  public getChildren(): any[] {
     return this.children;
   }
 
-  setChildren(children: any): void {
+  public setChildren(children: any): void {
     let tmpChildren = Array.isArray(children) ? children : [children];
 
     tmpChildren = Slot.parseChildren(tmpChildren);
@@ -163,7 +163,7 @@ export class Slot<K extends Props = DefaultProps> {
     this.children = tmpChildren;
   }
 
-  isComponent(): boolean {
+  public isComponent(): boolean {
     const tmpContentType: any = this.contentType;
 
     return (
@@ -173,19 +173,19 @@ export class Slot<K extends Props = DefaultProps> {
     );
   }
 
-  isFunction(): boolean {
+  public isFunction(): boolean {
     return typeof this.contentType === "function" && !this.isComponent();
   }
 
-  isElement(): boolean {
+  public isElement(): boolean {
     return typeof this.contentType === "string";
   }
 
-  isNull(): boolean {
+  public isNull(): boolean {
     return this.contentType === null;
   }
 
-  getKey(): any {
+  public getKey(): any {
     if (this.attributes === null) {
       return null;
     }
@@ -195,7 +195,7 @@ export class Slot<K extends Props = DefaultProps> {
     return key;
   }
 
-  getRef(): Ref<any> | null {
+  public getRef(): Ref<any> | null {
     if (this.attributes === null) {
       return null;
     }
@@ -205,7 +205,7 @@ export class Slot<K extends Props = DefaultProps> {
     return ref;
   }
 
-  getProps(): K {
+  public getProps(): K {
     const { key, ref, ...tmpAttributes } = this.attributes ?? {};
 
     const children = this.propsChildren ?? [];

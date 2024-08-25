@@ -11,7 +11,7 @@ import { Comparer } from "./Comparer";
 import { Context } from "./Context";
 
 export class Wrapper {
-  static wrapProps<A extends Props, B>(
+  public static wrapProps<A extends Props, B>(
     Child: ComponentType<A & B>,
     closure: (props: PropsNoChildren<A>) => B | null
   ): (props: A) => Slot<A & B> | null {
@@ -28,21 +28,21 @@ export class Wrapper {
     };
   }
 
-  static wrapContext<A extends Props, B>(
+  public static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
     context: Context,
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
-  static wrapContext<A extends Props, B>(
+  public static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
     contexts: Context[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A>;
-  static wrapContext<A extends Props, B>(
+  public static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
     tmpContexts: Context | Context[],
     ...selectors: ((
@@ -54,34 +54,31 @@ export class Wrapper {
     return class ContextWrapper extends Component<A> {
       private result: B | null = null;
 
-      private compareTimeout: number | undefined;
-
       constructor(props: A) {
         super(props);
 
-        this.on("mount", this.handleMount);
-        this.on("unmount", this.handleUnmount);
-      }
+        let timeout: number | undefined;
 
-      private compareListener = (): void => {
-        clearTimeout(this.compareTimeout);
+        const listener = (): void => {
+          clearTimeout(timeout);
 
-        this.compareTimeout = setTimeout((): void => {
-          this.compare();
+          timeout = setTimeout((): void => {
+            this.compare();
+          });
+        };
+
+        this.on("mount", (): void => {
+          for (const context of contexts) {
+            context.on("update", listener);
+          }
         });
-      };
 
-      private handleMount = (): void => {
-        for (const context of contexts) {
-          context.on("update", this.compareListener);
-        }
-      };
-
-      private handleUnmount = (): void => {
-        for (const context of contexts) {
-          context.off("update", this.compareListener);
-        }
-      };
+        this.on("unmount", (): void => {
+          for (const context of contexts) {
+            context.off("update", listener);
+          }
+        });
+      }
 
       // returned result will be merged with props and passed to Child
 
@@ -122,7 +119,7 @@ export class Wrapper {
         this.update();
       }
 
-      render(): any {
+      public render(): any {
         const { children, ...props } = this.props;
 
         this.result = this.select(); // it handles both update() calls and new props

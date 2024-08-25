@@ -33,7 +33,7 @@ export class Component<
 
   // triggerRender will be called by a renderer abstraction
 
-  triggerRender(handler: () => void): void {
+  public triggerRender(handler: () => void): void {
     const self = this as Stateful<L, AllComponentSignatures>;
 
     this.emit("render");
@@ -49,13 +49,13 @@ export class Component<
     }
   }
 
-  protected triggerMount(): void {
+  private triggerMount(): void {
     this.mounted = true;
 
     this.emit("mount");
   }
 
-  triggerUnmount(): void {
+  public triggerUnmount(): void {
     const self = this as Stateful<L, AllComponentSignatures>;
 
     self.off("rerender");
@@ -67,26 +67,20 @@ export class Component<
 
   // the component will receive a "rerender" handler via triggerRender
 
-  protected async queueUpdate(): Promise<void> {
+  protected async startUpdate(): Promise<void> {
     const self = this as Stateful<L, AllComponentSignatures>;
 
-    clearTimeout(this.updateTimeout);
-
-    this.updateTimeout = setTimeout((): void => {
-      self.emit("rerender");
-    });
-
-    return await super.queueUpdate();
+    self.emit("rerender");
   }
 
-  updateProps(props: K): void {
+  public updateProps(props: K): void {
     this.nextProps = props;
 
-    this.startUpdate();
+    this.performUpdate();
   }
 
-  protected startUpdate(): void {
-    super.startUpdate();
+  protected performUpdate(): void {
+    super.performUpdate();
 
     clearTimeout(this.updateTimeout);
   }
@@ -103,7 +97,7 @@ export class Component<
     this.nextProps = null;
   }
 
-  render(): any {
+  public render(): any {
     return [];
   }
 }

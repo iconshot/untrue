@@ -31,7 +31,7 @@ export class Transition extends Emitter<TransitionSignatures> {
     this.initialValue = animation.getValue();
   }
 
-  start(): void {
+  public start(): void {
     if (this.canceled) {
       return;
     }
@@ -40,7 +40,7 @@ export class Transition extends Emitter<TransitionSignatures> {
 
     let startTime: number | null = null;
 
-    const callback = (rafTime: number) => {
+    const callback = (rafTime: number): void => {
       // set startTime
 
       if (startTime === null) {

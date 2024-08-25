@@ -47,8 +47,6 @@ export class Persistor extends Emitter<PersistorSignatures> {
 
   Provider: ClassComponent<PersistorProviderProps>;
 
-  private persistTimeout: number | undefined;
-
   constructor(
     contexts: ContextsObject,
     Storage: StorageInterface,
@@ -77,20 +75,18 @@ export class Persistor extends Emitter<PersistorSignatures> {
 
         // init the Persistor on mount
 
-        this.on("mount", this.handleMount);
+        this.on("mount", async (): Promise<void> => {
+          try {
+            await self.init();
+          } catch (error) {
+            this.updateState({ error: true });
+
+            throw error;
+          } finally {
+            this.updateState({ loading: false });
+          }
+        });
       }
-
-      private handleMount = async (): Promise<void> => {
-        try {
-          await self.init();
-        } catch (error) {
-          this.updateState({ error: true });
-
-          throw error;
-        } finally {
-          this.updateState({ loading: false });
-        }
-      };
 
       render(): any {
         const {
@@ -114,17 +110,9 @@ export class Persistor extends Emitter<PersistorSignatures> {
     };
   }
 
-  private persistListener = (): void => {
-    clearTimeout(this.persistTimeout);
-
-    this.persistTimeout = setTimeout((): void => {
-      this.persist();
-    });
-  };
-
   // init() is called when the Provider is mounted
 
-  async init(): Promise<void> {
+  private async init(): Promise<void> {
     // content can be null when there's not an item found with the name this.name in Storage
 
     const content = await this.read();
@@ -135,21 +123,9 @@ export class Persistor extends Emitter<PersistorSignatures> {
       data = this.migrate(content.data, content.version);
     }
 
-    for (const key in this.contexts) {
-      const context = this.contexts[key];
+    this.bindContexts();
 
-      // start listening to updates
-
-      context.on("update", this.persistListener);
-
-      if (key in data) {
-        // hydrate context with the corresponding data
-
-        const value = data[key];
-
-        context.hydrate(value);
-      }
-    }
+    this.hydrateContexts(data);
 
     /*
     
@@ -161,6 +137,40 @@ export class Persistor extends Emitter<PersistorSignatures> {
     await this.persist();
 
     this.emit("init");
+  }
+
+  // listen to context updates
+
+  private bindContexts(): void {
+    let timeout: number | undefined;
+
+    const listener = (): void => {
+      clearTimeout(timeout);
+
+      timeout = setTimeout((): void => {
+        this.persist();
+      });
+    };
+
+    for (const key in this.contexts) {
+      const context = this.contexts[key];
+
+      context.on("update", listener);
+    }
+  }
+
+  // hydrate contexts with the right data
+
+  private hydrateContexts(data: StorageContent["data"]): void {
+    for (const key in this.contexts) {
+      const context = this.contexts[key];
+
+      if (key in data) {
+        const value = data[key];
+
+        context.hydrate(value);
+      }
+    }
   }
 
   // generate the content for the Storage item and write it

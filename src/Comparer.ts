@@ -34,7 +34,7 @@ export class Comparer {
 
   */
 
-  static compare(a: any, b: any): boolean {
+  public static compare(a: any, b: any): boolean {
     // for null a, check if b is also null
 
     if (a === null) {

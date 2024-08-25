@@ -1,5 +1,5 @@
 export class AnimationFrame {
-  static request(callback: (time: number) => void): number {
+  public static request(callback: (time: number) => void): number {
     if (typeof requestAnimationFrame !== "undefined") {
       return requestAnimationFrame(callback);
     }
@@ -11,7 +11,7 @@ export class AnimationFrame {
     }, 1000 / 60);
   }
 
-  static cancel(frame: number | undefined): void {
+  public static cancel(frame: number | undefined): void {
     if (frame === undefined) {
       return;
     }

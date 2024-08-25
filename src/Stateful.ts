@@ -9,7 +9,7 @@ export type StatefulSignatures = {
 
 type UpdateResolver = (value: void) => void;
 
-export class Stateful<
+export abstract class Stateful<
   L extends State,
   M extends StatefulSignatures
 > extends Emitter<M> {
@@ -22,7 +22,7 @@ export class Stateful<
 
   protected updateResolvers: UpdateResolver[] = [];
 
-  getState(): L {
+  public getState(): L {
     return this.state;
   }
 
@@ -58,13 +58,21 @@ export class Stateful<
     return await this.queueUpdate();
   }
 
-  protected queueUpdate(): Promise<void> {
+  private queueUpdate(): Promise<void> {
+    clearTimeout(this.updateTimeout);
+
+    this.updateTimeout = setTimeout((): void => {
+      this.startUpdate();
+    });
+
     return new Promise<void>((resolve): void => {
       this.updateResolvers.push(resolve);
     });
   }
 
-  protected startUpdate(): void {
+  protected abstract startUpdate(): void;
+
+  protected performUpdate(): void {
     this.replaceUpdate();
     this.resolveUpdate();
   }
