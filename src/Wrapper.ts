@@ -54,7 +54,7 @@ export class Wrapper {
     return class ContextWrapper extends Component<A> {
       private result: B | null = null;
 
-      protected init(): void {
+      public init(): void {
         let timeout: number | undefined;
 
         const listener = (): void => {

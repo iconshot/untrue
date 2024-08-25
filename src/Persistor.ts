@@ -68,7 +68,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
       PersistorProviderProps,
       PersistorProviderState
     > {
-      protected init(): void {
+      public init(): void {
         this.state = { loading: true, error: false };
 
         // init the Persistor on mount

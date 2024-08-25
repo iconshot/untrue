@@ -29,8 +29,6 @@ export class Component<
     super();
 
     this.props = props;
-
-    this.init();
   }
 
   // triggerRender will be called by a renderer abstraction
@@ -69,7 +67,7 @@ export class Component<
 
   // the component will receive a "rerender" handler via triggerRender
 
-  protected async startUpdate(): Promise<void> {
+  protected startUpdate(): void {
     const self = this as Stateful<L, AllComponentSignatures>;
 
     self.emit("rerender");

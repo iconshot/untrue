@@ -7,7 +7,9 @@ export class Context<L extends State = State> extends Stateful<
   constructor() {
     super();
 
-    this.init();
+    queueMicrotask((): void => {
+      this.init();
+    });
   }
 
   // methods used by Persistor
@@ -24,7 +26,7 @@ export class Context<L extends State = State> extends Stateful<
 
   // override Stateful methods
 
-  protected async startUpdate(): Promise<void> {
+  protected startUpdate(): void {
     this.performUpdate();
   }
 
