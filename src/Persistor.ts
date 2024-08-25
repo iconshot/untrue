@@ -68,9 +68,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
       PersistorProviderProps,
       PersistorProviderState
     > {
-      constructor(props: PersistorProviderProps) {
-        super(props);
-
+      protected init(): void {
         this.state = { loading: true, error: false };
 
         // init the Persistor on mount
@@ -88,7 +86,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
         });
       }
 
-      render(): any {
+      public render(): any {
         const {
           loadingChildren = null,
           errorChildren = null,

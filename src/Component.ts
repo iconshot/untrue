@@ -29,6 +29,8 @@ export class Component<
     super();
 
     this.props = props;
+
+    this.init();
   }
 
   // triggerRender will be called by a renderer abstraction

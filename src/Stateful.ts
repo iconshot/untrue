@@ -22,6 +22,8 @@ export abstract class Stateful<
 
   protected updateResolvers: UpdateResolver[] = [];
 
+  protected init(): void {}
+
   public getState(): L {
     return this.state;
   }

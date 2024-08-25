@@ -4,6 +4,12 @@ export class Context<L extends State = State> extends Stateful<
   L,
   StatefulSignatures
 > {
+  constructor() {
+    super();
+
+    this.init();
+  }
+
   // methods used by Persistor
 
   public persist(): any {

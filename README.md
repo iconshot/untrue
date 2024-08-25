@@ -50,19 +50,17 @@ interface AppState extends State {
 }
 
 class App extends Component<Props, AppState> {
-  constructor(props: Props) {
-    super(props);
-
+  init(): void {
     this.state = { counter: 0 };
   }
 
-  onIncrement = () => {
+  onIncrement = (): void => {
     const { counter } = this.state;
 
     this.updateState({ counter: counter + 1 });
   };
 
-  render() {
+  render(): any {
     // after the first click, counter is no longer 0 but 1
 
     const { counter } = this.state;
@@ -96,7 +94,7 @@ Components can be classes or functions and are used to group multiple slots.
 ```ts
 import $, { Component, Props, State } from "untrue";
 
-function App() {
+function App(): any {
   return [
     $(Header, { title: "Untrue" }), // pass title as prop (external data)
     $(Footer, { year: 2049 }), // pass year as prop (external data)
@@ -112,19 +110,17 @@ interface HeaderState extends State {
 }
 
 class Header extends Component<HeaderProps, HeaderState> {
-  constructor(props: HeaderProps) {
-    super(props);
-
+  init(): void {
     this.state = { counter: 0 };
   }
 
-  onIncrement = () => {
+  onIncrement = (): void => {
     const { counter } = this.state;
 
     this.updateState({ counter: counter + 1 });
   };
 
-  render() {
+  render(): any {
     const { title } = this.props; // external data
 
     const { counter } = this.state; // internal data
@@ -141,7 +137,7 @@ interface FooterProps extends Props {
   year: number;
 }
 
-function Footer({ year }: FooterProps) {
+function Footer({ year }: FooterProps): any {
   return $("footer", [
     $("span", `copyright, ${year}`),
     $("a", { href: "https://example.com" }, "follow me"),
@@ -184,17 +180,15 @@ interface TimerState extends State {
 }
 
 class Timer extends Component<Props, TimerState> {
-  interval: number | undefined;
-
-  constructor(props: Props) {
-    super(props);
-
+  init(): void {
     this.state = { counter: 0 };
+
+    let interval: number | undefined;
 
     // start interval on mount
 
     this.on("mount", () => {
-      this.interval = setInterval(() => {
+      interval = setInterval((): void => {
         const { counter } = this.state;
 
         this.updateState({ counter: counter + 1 });
@@ -203,13 +197,13 @@ class Timer extends Component<Props, TimerState> {
 
     // clear interval on unmount
 
-    this.on("unmount", () => {
-      clearInterval(this.interval);
+    this.on("unmount", (): void => {
+      clearInterval(interval);
     });
 
     // check "counter" change on update
 
-    this.on("update", () => {
+    this.on("update", (): void => {
       // this.props and this.prevProps are also available
 
       const { counter } = this.state;
@@ -221,7 +215,7 @@ class Timer extends Component<Props, TimerState> {
     });
   }
 
-  render() {
+  render(): any {
     const { counter } = this.state;
 
     return $("span", counter);
@@ -233,19 +227,17 @@ interface AppState extends State {
 }
 
 class App extends Component<Props, AppState> {
-  constructor(props: Props) {
-    super(props);
-
+  init(): void {
     this.state = { running: false };
   }
 
-  onClick = () => {
+  onClick = (): void => {
     const { running } = this.state;
 
     this.updateState({ running: !running });
   };
 
-  render() {
+  render(): any {
     const { running } = this.state;
 
     return [
