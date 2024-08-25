@@ -155,7 +155,7 @@ export class Transition extends Emitter<TransitionSignatures> {
       currentValue = this.initialValue + currentOffset;
     }
 
-    this.animation.update(currentValue);
+    this.animation.updateValue(currentValue);
   }
 
   private isTimeUp(): boolean {

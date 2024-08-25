@@ -19,7 +19,7 @@ export class Animation extends Emitter<AnimationSignatures> {
     return this.value;
   }
 
-  public update(value: number) {
+  public updateValue(value: number) {
     this.value = value;
 
     this.emit("update");
