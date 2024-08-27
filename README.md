@@ -165,10 +165,10 @@ The output HTML will be:
 
 ### Lifecycle events
 
-- `render`: Every render, whether it's a mount or an update.
 - `mount`: The first render.
-- `update`: Every rerender, whether it's caused by the component itself or a parent component.
-- `unmount`: Component is no longer part of the Tree.
+- `update`: Every render after the first one.
+- `render`: Every render. It's fired after `mount` or `update` events.
+- `unmount`: Component has been unmounted.
 
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
