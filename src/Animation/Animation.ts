@@ -26,8 +26,6 @@ export class Animation extends Emitter<AnimationSignatures> {
   }
 
   public bind(component: Component, listener: () => void): void {
-    component.on("render", listener);
-
     component.on("mount", (): void => {
       this.on("update", listener);
     });
@@ -35,6 +33,8 @@ export class Animation extends Emitter<AnimationSignatures> {
     component.on("unmount", (): void => {
       this.off("update", listener);
     });
+
+    component.on("render", listener);
   }
 
   public animate(

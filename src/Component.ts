@@ -36,8 +36,6 @@ export class Component<
   public triggerRender(handler: () => void): void {
     const self = this as Stateful<L, AllComponentSignatures>;
 
-    this.emit("render");
-
     self.off("rerender");
 
     self.on("rerender", handler);
@@ -47,6 +45,8 @@ export class Component<
     } else {
       this.triggerUpdate();
     }
+
+    this.emit("render");
   }
 
   private triggerMount(): void {
