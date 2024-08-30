@@ -79,12 +79,6 @@ export class Component<
     this.performUpdate();
   }
 
-  protected performUpdate(): void {
-    super.performUpdate();
-
-    clearTimeout(this.updateTimeout);
-  }
-
   protected replaceUpdate(): void {
     super.replaceUpdate();
 

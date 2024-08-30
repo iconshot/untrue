@@ -18,15 +18,11 @@ export abstract class Stateful<
   protected prevState: L | null = null;
   protected nextState: L | null = null;
 
-  protected updateTimeout: number | undefined;
+  private updateTimeout: number | undefined;
 
-  protected updateResolvers: UpdateResolver[] = [];
+  private updateResolvers: UpdateResolver[] = [];
 
   public init(): void {}
-
-  public getState(): L {
-    return this.state;
-  }
 
   protected triggerUpdate(): void {
     const self = this as Stateful<L, StatefulSignatures>;
@@ -75,6 +71,26 @@ export abstract class Stateful<
   protected abstract startUpdate(): void;
 
   protected performUpdate(): void {
+    /*
+
+    about the clearTimeout here:
+    
+    for components, because of batching, Tree delays the performUpdate calls;
+    by the time we reach this method,
+    we may have another updateTimeout waiting
+    but we can clear it out here since any change done to nextState
+    is about to be moved to state...
+    it's worth noting that this won't cause issues with any updateResolver
+    because they are created right after updateTimeout is set
+    and they're about to be resolved also.
+
+    for contexts, this won't cause any problem
+    because it's the timeout itself the one that ends up reaching this method
+
+    */
+
+    clearTimeout(this.updateTimeout);
+
     this.replaceUpdate();
     this.resolveUpdate();
   }

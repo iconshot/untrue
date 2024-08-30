@@ -6,16 +6,63 @@ import $, {
   PropsNoChildren,
 } from "./Slot";
 
+import { State } from "./Stateful";
 import { Component, Props } from "./Component";
-import { Comparer } from "./Comparer";
 import { Context } from "./Context";
 
+import { Comparer } from "./Comparer";
+
+class PublicComponent<K extends Props, L extends State> extends Component<
+  K,
+  L
+> {
+  public props: K;
+  public prevProps: K | null = null;
+  public nextProps: K | null = null;
+
+  public state: L;
+  public prevState: L | null = null;
+  public nextState: L | null = null;
+
+  public mounted: boolean = false;
+
+  public update(): Promise<void> {
+    return super.update();
+  }
+
+  public updateState(state: Partial<L>): Promise<void> {
+    return super.updateState(state);
+  }
+}
+
 export class Wrapper {
+  public static wrapComponent<K extends Props = Props, L extends State = State>(
+    initClosure: (
+      self: PublicComponent<K, L>
+    ) => ((props: K, state: L) => any) | null | void
+  ): ClassComponent<K> {
+    return class WrappedComponent extends PublicComponent<K, L> {
+      private renderClosure: ((props: K, state: L) => any) | null;
+
+      public init(): void {
+        this.renderClosure = initClosure(this) ?? null;
+      }
+
+      public render(): any {
+        if (this.renderClosure === null) {
+          return null;
+        }
+
+        return this.renderClosure(this.props, this.state);
+      }
+    };
+  }
+
   public static wrapProps<A extends Props, B>(
     Child: ComponentType<A & B>,
     closure: (props: PropsNoChildren<A>) => B | null
   ): (props: A) => Slot<A & B> | null {
-    return function PropsWrapper({ children, ...props }: A) {
+    return function WrappedProps({ children, ...props }: A) {
       const result = closure(props);
 
       if (result === null) {
@@ -51,7 +98,7 @@ export class Wrapper {
   ): ClassComponent<A> {
     const contexts = Array.isArray(tmpContexts) ? tmpContexts : [tmpContexts];
 
-    return class ContextWrapper extends Component<A> {
+    return class WrappedContext extends Component<A> {
       private result: B | null = null;
 
       public init(): void {

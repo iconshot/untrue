@@ -12,6 +12,10 @@ export class Context<L extends State = State> extends Stateful<
     });
   }
 
+  public getState(): L {
+    return this.state;
+  }
+
   // methods used by Persistor
 
   public persist(): any {
