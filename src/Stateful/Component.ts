@@ -1,4 +1,5 @@
 import { Stateful, State, StatefulSignatures } from "./Stateful";
+import { UpdatePromise } from "./UpdatePromise";
 
 export interface Props {
   children: any[];
@@ -24,6 +25,7 @@ export class Component<
   protected nextProps: K | null = null;
 
   protected mounted: boolean = false;
+  protected unmounted: boolean = false;
 
   constructor(props: K) {
     super();
@@ -31,41 +33,25 @@ export class Component<
     this.props = props;
   }
 
-  // triggerRender will be called by a renderer abstraction
+  // override update
 
-  public triggerRender(handler: () => void): void {
-    const self = this as Stateful<L, AllComponentSignatures>;
-
-    self.off("rerender");
-
-    self.on("rerender", handler);
-
-    if (!this.mounted) {
-      this.triggerMount();
-    } else {
-      this.triggerUpdate();
+  public update(): UpdatePromise {
+    if (this.unmounted) {
+      return new UpdatePromise(false);
     }
 
-    this.emit("render");
+    return super.update();
   }
 
-  private triggerMount(): void {
-    this.mounted = true;
+  public updateState(state: Partial<L>): UpdatePromise {
+    if (this.unmounted) {
+      return new UpdatePromise(false);
+    }
 
-    this.emit("mount");
+    return super.updateState(state);
   }
 
-  public triggerUnmount(): void {
-    const self = this as Stateful<L, AllComponentSignatures>;
-
-    self.off("rerender");
-
-    this.mounted = false;
-
-    this.emit("unmount");
-  }
-
-  // the component will receive a "rerender" handler via triggerRender
+  // the component will receive a "rerender" listener via triggerRender
 
   protected startUpdate(): void {
     const self = this as Stateful<L, AllComponentSignatures>;
@@ -89,6 +75,43 @@ export class Component<
     }
 
     this.nextProps = null;
+  }
+
+  // triggerRender will be called by a renderer abstraction
+
+  public triggerRender(listener: () => void): void {
+    const self = this as Stateful<L, AllComponentSignatures>;
+
+    self.off("rerender");
+
+    self.on("rerender", listener);
+
+    if (!this.mounted) {
+      this.triggerMount();
+    } else {
+      this.triggerUpdate();
+    }
+
+    this.emit("render");
+  }
+
+  private triggerMount(): void {
+    this.mounted = true;
+
+    this.emit("mount");
+  }
+
+  public triggerUnmount(): void {
+    const self = this as Stateful<L, AllComponentSignatures>;
+
+    self.off("rerender");
+
+    this.mounted = false;
+    this.unmounted = true;
+
+    this.settleNextUpdate(false);
+
+    this.emit("unmount");
   }
 
   public render(): any {

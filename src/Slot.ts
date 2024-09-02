@@ -1,5 +1,6 @@
-import { Component, Props } from "./Component";
 import { Ref } from "./Ref";
+
+import { Component, Props } from "./Stateful/Component";
 
 export type ClassComponent<K extends Props = Props> = new (
   props: K

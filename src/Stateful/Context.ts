@@ -4,14 +4,6 @@ export class Context<L extends State = State> extends Stateful<
   L,
   StatefulSignatures
 > {
-  constructor() {
-    super();
-
-    queueMicrotask((): void => {
-      this.init();
-    });
-  }
-
   public getState(): L {
     return this.state;
   }
@@ -28,14 +20,22 @@ export class Context<L extends State = State> extends Stateful<
     this.state = value;
   }
 
-  // override Stateful methods
+  /*
+
+  in Component, the startUpdate will emit a "rerender" event for the tree
+  and then the Tree will separate performUpdate (updateProps) from triggerUpdate (triggerRender)
+  because that's how it needs to work,
+
+  in Context, however, we don't depend on a Tree
+  so we do everything in startUpdate
+
+  basically once we reach startUpdate,
+  the update may be performed and finished successfully
+
+  */
 
   protected startUpdate(): void {
     this.performUpdate();
-  }
-
-  protected performUpdate(): void {
-    super.performUpdate();
 
     this.triggerUpdate();
   }

@@ -6,11 +6,12 @@ import $, {
   PropsNoChildren,
 } from "./Slot";
 
-import { State } from "./Stateful";
-import { Component, Props } from "./Component";
-import { Context } from "./Context";
-
 import { Comparer } from "./Comparer";
+
+import { State } from "./Stateful/Stateful";
+import { Component, Props } from "./Stateful/Component";
+import { Context } from "./Stateful/Context";
+import { UpdatePromise } from "./Stateful/UpdatePromise";
 
 class PublicComponent<K extends Props, L extends State> extends Component<
   K,
@@ -26,11 +27,11 @@ class PublicComponent<K extends Props, L extends State> extends Component<
 
   public mounted: boolean = false;
 
-  public update(): Promise<void> {
+  public update(): UpdatePromise {
     return super.update();
   }
 
-  public updateState(state: Partial<L>): Promise<void> {
+  public updateState(state: Partial<L>): UpdatePromise {
     return super.updateState(state);
   }
 }

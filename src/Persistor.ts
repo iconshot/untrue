@@ -1,8 +1,9 @@
-import { Component, Props } from "./Component";
-import { Context } from "./Context";
 import { Emitter } from "./Emitter";
 import { Children, ClassComponent } from "./Slot";
-import { State } from "./Stateful";
+
+import { State } from "./Stateful/Stateful";
+import { Component, Props } from "./Stateful/Component";
+import { Context } from "./Stateful/Context";
 
 export interface StorageInterface {
   getItem(key: string): (string | null) | Promise<string | null>;
