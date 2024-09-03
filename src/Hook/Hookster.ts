@@ -8,8 +8,6 @@ import { Effect } from "./Effect";
 
 type HooksterSignatures = {
   rerender: () => void;
-  "effect.run": () => void;
-  "effect.cleanup": () => void;
 };
 
 /*

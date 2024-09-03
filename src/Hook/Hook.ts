@@ -92,6 +92,43 @@ export class Hook {
     return tmpVar;
   }
 
+  public static useMemo<K>(closure: () => K, params: any[] = []): K {
+    const hookster = this.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    type Memo = {
+      value: K;
+      params: any[];
+    };
+
+    const index = hookster.index;
+
+    const prevMemo: Memo = hookster.get(index) ?? null;
+
+    let memo: Memo | null = null;
+
+    if (prevMemo !== null) {
+      const equal = Comparer.compare(params, prevMemo.params);
+
+      if (equal) {
+        memo = { value: prevMemo.value, params };
+      }
+    }
+
+    if (memo === null) {
+      memo = { value: closure(), params };
+    }
+
+    hookster.set(index, memo);
+
+    hookster.increment();
+
+    return memo.value;
+  }
+
   public static useEffect(
     closure: () => void | (() => void),
     params: any[] | null = null
