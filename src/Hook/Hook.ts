@@ -177,13 +177,13 @@ export class Hook {
 
   public static useContext<B>(
     context: Context | Context[],
-    ...selectors: ((data: Partial<B>) => Partial<B> | null)[]
+    selector: () => B | null
   ): B | null {
     const contexts = Array.isArray(context) ? context : [context];
 
     const update = Hook.useUpdate();
 
-    const result = Hook.selectContext(selectors);
+    const result = selector();
 
     Hook.useEffect((): (() => void) => {
       let timeout: number | undefined;
@@ -192,7 +192,7 @@ export class Hook {
         clearTimeout(timeout);
 
         timeout = setTimeout((): void => {
-          const tmpResult = Hook.selectContext(selectors);
+          const tmpResult = selector();
 
           const equal = Comparer.compare(result, tmpResult);
 
