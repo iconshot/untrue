@@ -164,7 +164,7 @@ export class Slot<K extends Props = DefaultProps> {
     this.children = tmpChildren;
   }
 
-  public isComponent(): boolean {
+  public isClass(): boolean {
     const tmpContentType: any = this.contentType;
 
     return (
@@ -175,7 +175,7 @@ export class Slot<K extends Props = DefaultProps> {
   }
 
   public isFunction(): boolean {
-    return typeof this.contentType === "function" && !this.isComponent();
+    return typeof this.contentType === "function" && !this.isClass();
   }
 
   public isElement(): boolean {

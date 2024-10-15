@@ -12,7 +12,7 @@ npm i untrue @untrue/web
 
 Compatible with any build tool: [Parcel](https://parceljs.org/), [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), etc.
 
-Native app development coming soon.
+<sub>Native app development available with [Detonator](https://detonator.dev).</sub>
 
 ## Get started
 

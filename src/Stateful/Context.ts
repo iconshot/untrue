@@ -1,4 +1,5 @@
 import { Stateful, State, StatefulSignatures } from "./Stateful";
+import { UpdatePromise } from "./UpdatePromise";
 
 export class Context<L extends State = State> extends Stateful<
   L,
@@ -18,6 +19,16 @@ export class Context<L extends State = State> extends Stateful<
 
   public hydrate(value: any): void {
     this.state = value;
+  }
+
+  // override update
+
+  public update(): UpdatePromise {
+    return super.update();
+  }
+
+  public updateState(state: Partial<L>): UpdatePromise {
+    return super.updateState(state);
   }
 
   /*

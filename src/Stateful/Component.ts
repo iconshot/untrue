@@ -33,9 +33,11 @@ export class Component<
     this.props = props;
   }
 
+  public init(): void {}
+
   // override update
 
-  public update(): UpdatePromise {
+  protected update(): UpdatePromise {
     if (this.unmounted) {
       return new UpdatePromise(false);
     }
@@ -43,7 +45,7 @@ export class Component<
     return super.update();
   }
 
-  public updateState(state: Partial<L>): UpdatePromise {
+  protected updateState(state: Partial<L>): UpdatePromise {
     if (this.unmounted) {
       return new UpdatePromise(false);
     }

@@ -78,26 +78,12 @@ export class Wrapper {
 
   public static wrapContext<A extends Props, B>(
     Child: ComponentType<A & B>,
-    context: Context,
-    ...selectors: ((
-      props: PropsNoChildren<A> & Partial<B>
-    ) => Partial<B> | null)[]
-  ): ClassComponent<A>;
-  public static wrapContext<A extends Props, B>(
-    Child: ComponentType<A & B>,
-    contexts: Context[],
-    ...selectors: ((
-      props: PropsNoChildren<A> & Partial<B>
-    ) => Partial<B> | null)[]
-  ): ClassComponent<A>;
-  public static wrapContext<A extends Props, B>(
-    Child: ComponentType<A & B>,
-    tmpContexts: Context | Context[],
+    context: Context | Context[],
     ...selectors: ((
       props: PropsNoChildren<A> & Partial<B>
     ) => Partial<B> | null)[]
   ): ClassComponent<A> {
-    const contexts = Array.isArray(tmpContexts) ? tmpContexts : [tmpContexts];
+    const contexts = Array.isArray(context) ? context : [context];
 
     return class WrappedContext extends Component<A> {
       private result: B | null = null;

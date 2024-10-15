@@ -177,8 +177,8 @@ export class Hook {
 
   public static useContext<B>(
     context: Context | Context[],
-    selector: () => B | null
-  ): B | null {
+    selector: () => B
+  ): B {
     const contexts = Array.isArray(context) ? context : [context];
 
     const update = Hook.useUpdate();
@@ -216,29 +216,6 @@ export class Hook {
     });
 
     return result;
-  }
-
-  private static selectContext<B>(
-    selectors: ((data: Partial<B>) => Partial<B> | null)[]
-  ): B | null {
-    return selectors.reduce<Partial<B> | null>(
-      (result, selector): Partial<B> | null => {
-        if (result === null) {
-          return null;
-        }
-
-        const tmpResult = selector(result);
-
-        if (tmpResult === null) {
-          return null;
-        }
-
-        const mergedResult = { ...result, ...tmpResult };
-
-        return mergedResult;
-      },
-      {}
-    ) as B | null;
   }
 
   // consistent with Animation.bind

@@ -25,8 +25,6 @@ export abstract class Stateful<
 
   private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
-  public init(): void {}
-
   protected update(): UpdatePromise {
     return this.queueUpdate();
   }
