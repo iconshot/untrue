@@ -1,7 +1,7 @@
 import { Stateful, State, StatefulSignatures } from "./Stateful";
 import { UpdatePromise } from "./UpdatePromise";
 
-export class Context<L extends State = State> extends Stateful<
+export class Context<L extends State = State, M = any> extends Stateful<
   L,
   StatefulSignatures
 > {
@@ -11,11 +11,11 @@ export class Context<L extends State = State> extends Stateful<
 
   // methods used by Persistor
 
-  public persist(): any {
+  public persist(): M | undefined {
     return undefined;
   }
 
-  public hydrate(value: any): void {}
+  public hydrate(value: M): void {}
 
   // override update
 
