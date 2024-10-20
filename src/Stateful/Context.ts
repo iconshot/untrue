@@ -12,14 +12,10 @@ export class Context<L extends State = State> extends Stateful<
   // methods used by Persistor
 
   public persist(): any {
-    const value = this.state;
-
-    return value;
+    return undefined;
   }
 
-  public hydrate(value: any): void {
-    this.state = value;
-  }
+  public hydrate(value: any): void {}
 
   // override update
 

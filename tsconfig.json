@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "es2017",
+    "target": "es2020",
     "module": "Node16",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
