@@ -1,5 +1,6 @@
 import { Emitter } from "../Emitter";
-import { Comparer } from "../Comparer";
+
+import { Hook } from "./Hook";
 
 type EffectSignatures = {
   run: () => void;
@@ -47,7 +48,7 @@ export class Effect extends Emitter<EffectSignatures> {
   public run(prevEffect: Effect | null): void {
     if (this.params !== null) {
       if (prevEffect !== null) {
-        const equal = Comparer.compare(this.params, prevEffect.params);
+        const equal = Hook.compare(this.params, prevEffect.params);
 
         if (equal) {
           this.cleanup = prevEffect.cleanup;

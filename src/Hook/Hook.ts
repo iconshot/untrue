@@ -106,21 +106,19 @@ export class Hook {
 
     const index = hookster.index;
 
-    const prevMemo: Memo = hookster.get(index) ?? null;
+    const prevMemo: Memo | null = hookster.get(index) ?? null;
 
     let memo: Memo | null = null;
 
     if (prevMemo !== null) {
-      const equal = Comparer.compare(params, prevMemo.params);
+      const equal = Hook.compare(params, prevMemo.params);
 
       if (equal) {
         memo = { value: prevMemo.value, params };
       }
     }
 
-    if (memo === null) {
-      memo = { value: closure(), params };
-    }
+    memo ??= { value: closure(), params };
 
     hookster.set(index, memo);
 
@@ -225,10 +223,10 @@ export class Hook {
 
     // initial animation and listener
 
-    Hook.useEffect(() => {
+    Hook.useEffect((): (() => void) => {
       animation.on("update", listener);
 
-      return () => {
+      return (): void => {
         animation.off("update", listener);
       };
     }, []);
@@ -236,6 +234,30 @@ export class Hook {
     // listenerVar.current is the initial listener
 
     Hook.useEffect(listenerVar.current);
+  }
+
+  /*
+
+  Comparer.compare does a deep comparison
+  while Hook.compare does a simpler shallow comparison
+  based on "params" used in useEffect, useMemo, etc
+
+  */
+
+  public static compare(a: any[] | null, b: any[] | null): boolean {
+    if (a === null) {
+      return b === null;
+    }
+
+    if (!Array.isArray(b)) {
+      return false;
+    }
+
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    return a.every((element, i): boolean => element === b[i]);
   }
 
   public static activeHookster: Hookster | null = null;
