@@ -16,5 +16,6 @@ export * from "./Hook/Hook";
 export * from "./Hook/Hookster";
 
 export * from "./Animation/Animation";
+export * from "./Animation/Transition";
 export * from "./Animation/Easing";
 export * from "./Animation/AnimationFrame";

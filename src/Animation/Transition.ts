@@ -162,5 +162,3 @@ export class Transition extends Emitter<TransitionSignatures> {
     return this.currentTime >= this.finalTime;
   }
 }
-
-export default Transition;
