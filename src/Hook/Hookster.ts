@@ -6,116 +6,52 @@ import { UpdatePromise } from "../Stateful/UpdatePromise";
 import { Hook } from "./Hook";
 import { Effect } from "./Effect";
 
-type HooksterSignatures = {
-  rerender: () => void;
+export type HooksterSignatures = {
+  mount: () => any;
+  unmount: () => any;
+  update: () => any;
+  render: () => any;
+};
+
+type AllHooksterSignatures = HooksterSignatures & {
+  rerender: () => any;
 };
 
 /*
 
-a lot of this Hookster class is consistent with Component
-for brevity we have changed the names, for example:
+consistent with Component
 
-Component.updateTimeout -> Hookster.timeout
-Component.queueUpdate -> Hookster.queue
-Component.replaceUpdate -> Hookster.replace
-
-and so on...
-
-Hookster.hooked is consistent with Component.mounted
-and Hookster.unhooked with Component.unmounted,
-they are set in the same places
-
-the reason why they don't have the same names even though they represent the same booleans
-is that a hookster is never actually "mounted" in the Tree,
-the final user doesn't work with a hookster instance the way they could with class components,
-a hookster is just used by Tree to add hooks support to function components, and that's it
-
-Component.triggerRender -> Hookster.hook
-Component.triggerUnmount -> Hookster.unhook
-
-in the Tree abstraction,
-both triggerRender and hook methods are placed
-at the end of the renderComponent and renderFunction respectively
-
-same with triggerUnmount and unhook,
-they are both placed in an unmountEdge method
+this class is used to keep hook state of a function component
 
 */
 
-export class Hookster extends Emitter<HooksterSignatures> {
+export class Hookster extends Emitter<AllHooksterSignatures> {
   public index: number = 0;
 
   private prevIndex: number | null = null;
 
   private values: any[] = [];
 
+  private prevValues: any[] | null = null;
+
   private nextValues: Map<number, any> = new Map();
 
   private effects: Effect[] = [];
 
-  private prevEffects: Effect[] = [];
+  private prevEffects: Effect[] | null = null;
 
-  private hooked: boolean = false;
-  private unhooked: boolean = false;
+  private mounted: boolean = false;
+  private unmounted: boolean = false;
 
   private updateId: number = -1;
   private nextUpdateId: number = 0;
 
-  private timeout: number | undefined;
+  private updateTimeout: number | undefined;
 
-  private promises: Map<number, UpdatePromise[]> = new Map();
+  private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
   public activate(): void {
     Hook.activeHookster = this;
-
-    /*
-
-    since this.hooked is set to true only in the hook() method
-    it will be false in the first activate() call
-
-    so that would leave us with:
-    
-    hooked false means "mount"
-    hooked true means "update"
-
-    this is not exclusive to Hookster though,
-    the same thing applies to Component
-    where the first triggerRender will have a false `mounted`
-    meaning it's a "mount" call
-
-    */
-
-    if (!this.hooked) {
-      return;
-    }
-
-    /*
-
-    these next lines would be the
-    equivalent to Component's updateProps -> performUpdate
-    where we prepare the update (change state/props)
-    so everything is ready for the next component.render()
-
-    in this case, everything will have to be ready
-    for the next function component call
-
-    */
-
-    this.prevIndex = this.index;
-
-    this.index = 0;
-
-    this.prevEffects = this.effects;
-
-    this.effects = [];
-
-    clearTimeout(this.timeout);
-
-    this.updateId = this.nextUpdateId;
-
-    this.nextUpdateId++;
-
-    this.replace();
   }
 
   public deactivate(): void {
@@ -126,16 +62,24 @@ export class Hookster extends Emitter<HooksterSignatures> {
     }
   }
 
-  public has(index: number): boolean {
+  public hasValue(index: number): boolean {
     return index < this.values.length;
   }
 
-  public get(index: number): any {
+  public getValue(index: number): any {
     return this.values[index];
   }
 
-  public set(index: number, value: any): void {
+  public setValue(index: number, value: any): void {
     this.values[index] = value;
+  }
+
+  public getPrevValue(index: number): any {
+    if (this.prevValues === null) {
+      return null;
+    }
+
+    return this.prevValues[index];
   }
 
   public increment(): void {
@@ -143,15 +87,15 @@ export class Hookster extends Emitter<HooksterSignatures> {
   }
 
   public update(): UpdatePromise {
-    if (this.unhooked) {
+    if (this.unmounted) {
       return new UpdatePromise(false);
     }
 
-    return this.queue();
+    return this.queueUpdate();
   }
 
   public updateValue(index: number, value: any): UpdatePromise {
-    if (this.unhooked) {
+    if (this.unmounted) {
       return new UpdatePromise(false);
     }
 
@@ -167,24 +111,24 @@ export class Hookster extends Emitter<HooksterSignatures> {
 
     this.nextValues.set(index, value);
 
-    return this.queue();
+    return this.queueUpdate();
   }
 
-  public queue(): UpdatePromise {
-    clearTimeout(this.timeout);
+  public queueUpdate(): UpdatePromise {
+    clearTimeout(this.updateTimeout);
 
-    this.timeout = setTimeout((): void => {
+    this.updateTimeout = setTimeout((): void => {
       this.emit("rerender");
     });
 
     const promise = new UpdatePromise(null);
 
-    let promises = this.promises.get(this.nextUpdateId);
+    let promises = this.updatePromises.get(this.nextUpdateId);
 
     if (promises === undefined) {
       promises = [];
 
-      this.promises.set(this.nextUpdateId, promises);
+      this.updatePromises.set(this.nextUpdateId, promises);
     }
 
     promises.push(promise);
@@ -192,7 +136,34 @@ export class Hookster extends Emitter<HooksterSignatures> {
     return promise;
   }
 
-  private replace(): void {
+  public performUpdate(): void {
+    this.prevIndex = this.index;
+
+    this.index = 0;
+
+    this.off("mount");
+    this.off("unmount");
+    this.off("update");
+    this.off("render");
+
+    this.prevEffects = this.effects;
+
+    this.effects = [];
+
+    clearTimeout(this.updateTimeout);
+
+    this.updateId = this.nextUpdateId;
+
+    this.nextUpdateId++;
+
+    this.replaceUpdate();
+  }
+
+  private replaceUpdate(): void {
+    this.prevValues = this.values;
+
+    this.values = [...this.values];
+
     this.nextValues.forEach((value, key): void => {
       this.values[key] = value;
     });
@@ -200,8 +171,8 @@ export class Hookster extends Emitter<HooksterSignatures> {
     this.nextValues.clear();
   }
 
-  private settlePromises(updateId: number, value: boolean): void {
-    const promises = this.promises.get(updateId);
+  private settleUpdatePromises(updateId: number, value: boolean): void {
+    const promises = this.updatePromises.get(updateId);
 
     if (promises === undefined) {
       return;
@@ -211,15 +182,15 @@ export class Hookster extends Emitter<HooksterSignatures> {
       promise.settle(value);
     });
 
-    this.promises.delete(updateId);
+    this.updatePromises.delete(updateId);
   }
 
-  private settle(value: boolean): void {
-    this.settlePromises(this.updateId, value);
+  private settleUpdate(value: boolean): void {
+    this.settleUpdatePromises(this.updateId, value);
   }
 
-  private settleNext(value: boolean): void {
-    this.settlePromises(this.nextUpdateId, value);
+  private settleNextUpdate(value: boolean): void {
+    this.settleUpdatePromises(this.nextUpdateId, value);
   }
 
   public addEffect(effect: Effect): void {
@@ -228,7 +199,7 @@ export class Hookster extends Emitter<HooksterSignatures> {
 
   public runEffects(): void {
     this.effects.forEach((effect, i): void => {
-      const prevEffect = this.prevEffects[i] ?? null;
+      const prevEffect = this.prevEffects?.[i] ?? null;
 
       effect.run(prevEffect);
     });
@@ -240,32 +211,44 @@ export class Hookster extends Emitter<HooksterSignatures> {
     });
   }
 
-  public hook(listener: () => void): void {
+  public triggerRender(listener: () => void): void {
     this.off("rerender");
 
     this.on("rerender", listener);
 
-    if (!this.hooked) {
-      // mount
-
-      this.hooked = true;
+    if (!this.mounted) {
+      this.triggerMount();
     } else {
-      // update
-
-      this.settle(true);
+      this.triggerUpdate();
     }
+
+    this.emit("render");
 
     this.runEffects();
   }
 
-  public unhook(): void {
+  public triggerUnmount(): void {
     this.off("rerender");
 
-    this.hooked = false;
-    this.unhooked = true;
+    this.mounted = false;
+    this.unmounted = true;
 
-    this.settleNext(false);
+    this.settleNextUpdate(false);
+
+    this.emit("unmount");
 
     this.cleanUpEffects();
+  }
+
+  private triggerMount(): void {
+    this.mounted = true;
+
+    this.emit("mount");
+  }
+
+  private triggerUpdate(): void {
+    this.settleUpdate(true);
+
+    this.emit("update");
   }
 }

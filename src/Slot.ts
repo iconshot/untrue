@@ -6,7 +6,10 @@ export type ClassComponent<K extends Props = Props> = new (
   props: K
 ) => Component<K>;
 
-export type FunctionComponent<K extends Props = Props> = (props: K) => any;
+export type FunctionComponent<K extends Props = Props> = (
+  props: K,
+  prevProps?: K | null
+) => any;
 
 export type ComponentType<K extends Props = Props> =
   | ClassComponent<K>

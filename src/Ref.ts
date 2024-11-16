@@ -1,3 +1,3 @@
 export class Ref<K> {
-  constructor(public current: K | null = null) {}
+  constructor(public value: K | null = null) {}
 }

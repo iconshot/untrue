@@ -1,4 +1,6 @@
-import Component from "../Stateful/Component";
+import { Component } from "../Stateful/Component";
+
+import { Hook } from "../Hook/Hook";
 
 import { Emitter } from "../Emitter";
 
@@ -23,18 +25,6 @@ export class Animation extends Emitter<AnimationSignatures> {
     this.value = value;
 
     this.emit("update");
-  }
-
-  public bind(component: Component, listener: () => void): void {
-    component.on("mount", (): void => {
-      this.on("update", listener);
-    });
-
-    component.on("unmount", (): void => {
-      this.off("update", listener);
-    });
-
-    component.on("render", listener);
   }
 
   public animate(
@@ -248,5 +238,39 @@ export class Animation extends Emitter<AnimationSignatures> {
     }
 
     return num as any;
+  }
+
+  public bind(component: Component, listener: () => void): void {
+    component.on("mount", (): void => {
+      this.on("update", listener);
+    });
+
+    component.on("unmount", (): void => {
+      this.off("update", listener);
+    });
+
+    component.on("render", listener);
+  }
+
+  public use(listener: () => void): void {
+    const listenerVar = Hook.useVar<() => void>(listener);
+
+    listenerVar.value = listener;
+
+    Hook.useEffect((): (() => void) => {
+      const tmpListener = (): void => {
+        const listener = listenerVar.value;
+
+        listener();
+      };
+
+      this.on("update", tmpListener);
+
+      return (): void => {
+        this.off("update", tmpListener);
+      };
+    }, []);
+
+    Hook.useEffect(listener);
   }
 }

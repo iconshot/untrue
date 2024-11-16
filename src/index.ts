@@ -13,7 +13,7 @@ export * from "./Stateful/Context";
 export * from "./Stateful/Component";
 
 export * from "./Hook/Hook";
-export * from "./Hook/Hookster";
+export { Hookster } from "./Hook/Hookster";
 
 export * from "./Animation/Animation";
 export * from "./Animation/Transition";

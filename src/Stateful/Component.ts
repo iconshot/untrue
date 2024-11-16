@@ -6,9 +6,9 @@ export interface Props {
 }
 
 type ComponentSignatures = StatefulSignatures & {
-  render: () => any;
   mount: () => any;
   unmount: () => any;
+  render: () => any;
 };
 
 type AllComponentSignatures = ComponentSignatures & {
@@ -97,12 +97,6 @@ export class Component<
     this.emit("render");
   }
 
-  private triggerMount(): void {
-    this.mounted = true;
-
-    this.emit("mount");
-  }
-
   public triggerUnmount(): void {
     const self = this as Stateful<L, AllComponentSignatures>;
 
@@ -116,9 +110,13 @@ export class Component<
     this.emit("unmount");
   }
 
+  private triggerMount(): void {
+    this.mounted = true;
+
+    this.emit("mount");
+  }
+
   public render(): any {
     return [];
   }
 }
-
-export default Component;

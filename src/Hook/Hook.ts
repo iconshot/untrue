@@ -9,7 +9,7 @@ import { Context } from "../Stateful/Context";
 import { UpdatePromise } from "../Stateful/UpdatePromise";
 
 import { Effect } from "./Effect";
-import { Hookster } from "./Hookster";
+import { Hookster, HooksterSignatures } from "./Hookster";
 
 export class Hook {
   public static useUpdate(): () => UpdatePromise {
@@ -25,14 +25,16 @@ export class Hook {
       return hookster.update();
     };
 
-    hookster.set(index, null);
+    hookster.setValue(index, null);
 
     hookster.increment();
 
     return update;
   }
 
-  public static useState<K>(value: K): [K, (value: K) => UpdatePromise] {
+  public static useState<K>(
+    value: K
+  ): [K, (value: K) => UpdatePromise, K | null] {
     const hookster = this.activeHookster;
 
     if (hookster === null) {
@@ -41,17 +43,21 @@ export class Hook {
 
     const index = hookster.index;
 
-    const tmpValue = hookster.has(index) ? hookster.get(index) : value;
+    const tmpValue: K = hookster.hasValue(index)
+      ? hookster.getValue(index)
+      : value;
+
+    const prevValue: K | null = hookster.getPrevValue(index);
 
     const updateValue = (value: K): UpdatePromise => {
       return hookster.updateValue(index, value);
     };
 
-    hookster.set(index, tmpValue);
+    hookster.setValue(index, tmpValue);
 
     hookster.increment();
 
-    return [tmpValue, updateValue];
+    return [tmpValue, updateValue, prevValue];
   }
 
   public static useRef<K>(value: K | null = null): Ref<K> {
@@ -63,9 +69,11 @@ export class Hook {
 
     const index = hookster.index;
 
-    const ref = hookster.has(index) ? hookster.get(index) : new Ref<K>(value);
+    const ref: Ref<K> = hookster.hasValue(index)
+      ? hookster.getValue(index)
+      : new Ref<K>(value);
 
-    hookster.set(index, ref);
+    hookster.setValue(index, ref);
 
     hookster.increment();
 
@@ -81,15 +89,35 @@ export class Hook {
 
     const index = hookster.index;
 
-    const tmpVar = hookster.has(index)
-      ? hookster.get(index)
+    const tmpVar: Var<K> = hookster.hasValue(index)
+      ? hookster.getValue(index)
       : new Var<K>(value);
 
-    hookster.set(index, tmpVar);
+    hookster.setValue(index, tmpVar);
 
     hookster.increment();
 
     return tmpVar;
+  }
+
+  public static useAnimation(value: number): Animation {
+    const hookster = this.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    const index = hookster.index;
+
+    const animation: Animation = hookster.hasValue(index)
+      ? hookster.getValue(index)
+      : new Animation(value);
+
+    hookster.setValue(index, animation);
+
+    hookster.increment();
+
+    return animation;
   }
 
   public static useMemo<K>(closure: () => K, params: any[] = []): K {
@@ -106,7 +134,7 @@ export class Hook {
 
     const index = hookster.index;
 
-    const prevMemo: Memo | null = hookster.get(index) ?? null;
+    const prevMemo: Memo | null = hookster.getValue(index) ?? null;
 
     let memo: Memo | null = null;
 
@@ -120,7 +148,7 @@ export class Hook {
 
     memo ??= { value: closure(), params };
 
-    hookster.set(index, memo);
+    hookster.setValue(index, memo);
 
     hookster.increment();
 
@@ -143,7 +171,7 @@ export class Hook {
 
     hookster.addEffect(effect);
 
-    hookster.set(index, null);
+    hookster.setValue(index, null);
 
     hookster.increment();
   }
@@ -168,7 +196,26 @@ export class Hook {
 
     hookster.addEffect(effect);
 
-    hookster.set(index, null);
+    hookster.setValue(index, null);
+
+    hookster.increment();
+  }
+
+  public static useLifecycle<K extends keyof HooksterSignatures>(
+    name: K,
+    listener: () => any
+  ): void {
+    const hookster = this.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    const index = hookster.index;
+
+    hookster.on(name, listener);
+
+    hookster.setValue(index, null);
 
     hookster.increment();
   }
@@ -181,7 +228,15 @@ export class Hook {
 
     const update = Hook.useUpdate();
 
+    const selectorVar = Hook.useVar<() => B>(selector);
+
+    selectorVar.value = selector;
+
     const result = selector();
+
+    const resultVar = Hook.useVar<B>(result);
+
+    resultVar.value = result;
 
     Hook.useEffect((): (() => void) => {
       let timeout: number | undefined;
@@ -190,6 +245,10 @@ export class Hook {
         clearTimeout(timeout);
 
         timeout = setTimeout((): void => {
+          const selector = selectorVar.value;
+
+          const result = resultVar.value;
+
           const tmpResult = selector();
 
           const equal = Comparer.compare(result, tmpResult);
@@ -211,29 +270,9 @@ export class Hook {
           context.off("update", listener);
         }
       };
-    });
-
-    return result;
-  }
-
-  // consistent with Animation.bind
-
-  public static useAnimation(animation: Animation, listener: () => void): void {
-    const listenerVar = Hook.useVar<() => void>(listener);
-
-    // initial animation and listener
-
-    Hook.useEffect((): (() => void) => {
-      animation.on("update", listener);
-
-      return (): void => {
-        animation.off("update", listener);
-      };
     }, []);
 
-    // listenerVar.current is the initial listener
-
-    Hook.useEffect(listenerVar.current);
+    return result;
   }
 
   /*
