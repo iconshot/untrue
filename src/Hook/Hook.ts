@@ -270,7 +270,7 @@ export class Hook {
           context.off("update", listener);
         }
       };
-    }, []);
+    }, contexts);
 
     return result;
   }

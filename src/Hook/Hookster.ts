@@ -114,7 +114,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     return this.queueUpdate();
   }
 
-  public queueUpdate(): UpdatePromise {
+  private queueUpdate(): UpdatePromise {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout((): void => {
@@ -197,7 +197,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.effects.push(effect);
   }
 
-  public runEffects(): void {
+  private runEffects(): void {
     this.effects.forEach((effect, i): void => {
       const prevEffect = this.prevEffects?.[i] ?? null;
 
@@ -205,7 +205,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     });
   }
 
-  public cleanUpEffects(): void {
+  private cleanUpEffects(): void {
     this.effects.forEach((effect): void => {
       effect.cleanUp();
     });
