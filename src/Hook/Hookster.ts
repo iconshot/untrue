@@ -60,29 +60,34 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     if (this.prevIndex !== null && this.index !== this.prevIndex) {
       throw new Error("Irregular number of hooks.");
     }
+
+    if (
+      this.prevEffects !== null &&
+      this.effects.length !== this.prevEffects.length
+    ) {
+      throw new Error("Irregular number of hooks.");
+    }
   }
 
-  public hasValue(index: number): boolean {
-    return index < this.values.length;
+  public hasValue(): boolean {
+    return this.index < this.values.length;
   }
 
-  public getValue(index: number): any {
-    return this.values[index];
+  public getValue(): any {
+    return this.values[this.index];
   }
 
-  public setValue(index: number, value: any): void {
-    this.values[index] = value;
-  }
-
-  public getPrevValue(index: number): any {
+  public getPrevValue(): any {
     if (this.prevValues === null) {
       return null;
     }
 
-    return this.prevValues[index];
+    return this.prevValues[this.index];
   }
 
-  public increment(): void {
+  public addValue(value: any): void {
+    this.values[this.index] = value;
+
     this.index++;
   }
 
@@ -99,7 +104,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
       return new UpdatePromise(false);
     }
 
-    if (!this.nextValues.has(index)) {
+    if (this.nextValues.size === 0) {
       const currentValue = this.values[index];
 
       const equal = Comparer.compare(value, currentValue);

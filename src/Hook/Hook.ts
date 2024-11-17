@@ -19,15 +19,9 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
     const update = (): UpdatePromise => {
       return hookster.update();
     };
-
-    hookster.setValue(index, null);
-
-    hookster.increment();
 
     return update;
   }
@@ -43,19 +37,15 @@ export class Hook {
 
     const index = hookster.index;
 
-    const tmpValue: K = hookster.hasValue(index)
-      ? hookster.getValue(index)
-      : value;
+    const tmpValue: K = hookster.hasValue() ? hookster.getValue() : value;
 
-    const prevValue: K | null = hookster.getPrevValue(index);
+    const prevValue: K | null = hookster.getPrevValue();
 
     const updateValue = (value: K): UpdatePromise => {
       return hookster.updateValue(index, value);
     };
 
-    hookster.setValue(index, tmpValue);
-
-    hookster.increment();
+    hookster.addValue(tmpValue);
 
     return [tmpValue, updateValue, prevValue];
   }
@@ -67,15 +57,11 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
-    const ref: Ref<K> = hookster.hasValue(index)
-      ? hookster.getValue(index)
+    const ref: Ref<K> = hookster.hasValue()
+      ? hookster.getValue()
       : new Ref<K>(value);
 
-    hookster.setValue(index, ref);
-
-    hookster.increment();
+    hookster.addValue(ref);
 
     return ref;
   }
@@ -87,15 +73,11 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
-    const tmpVar: Var<K> = hookster.hasValue(index)
-      ? hookster.getValue(index)
+    const tmpVar: Var<K> = hookster.hasValue()
+      ? hookster.getValue()
       : new Var<K>(value);
 
-    hookster.setValue(index, tmpVar);
-
-    hookster.increment();
+    hookster.addValue(tmpVar);
 
     return tmpVar;
   }
@@ -107,15 +89,11 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
-    const animation: Animation = hookster.hasValue(index)
-      ? hookster.getValue(index)
+    const animation: Animation = hookster.hasValue()
+      ? hookster.getValue()
       : new Animation(value);
 
-    hookster.setValue(index, animation);
-
-    hookster.increment();
+    hookster.addValue(animation);
 
     return animation;
   }
@@ -132,9 +110,9 @@ export class Hook {
       params: any[];
     };
 
-    const index = hookster.index;
-
-    const prevMemo: Memo | null = hookster.getValue(index) ?? null;
+    const prevMemo: Memo | null = hookster.hasValue()
+      ? hookster.getValue()
+      : null;
 
     let memo: Memo | null = null;
 
@@ -148,9 +126,7 @@ export class Hook {
 
     memo ??= { value: closure(), params };
 
-    hookster.setValue(index, memo);
-
-    hookster.increment();
+    hookster.addValue(memo);
 
     return memo.value;
   }
@@ -165,15 +141,9 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
     const effect = new Effect(closure, params);
 
     hookster.addEffect(effect);
-
-    hookster.setValue(index, null);
-
-    hookster.increment();
   }
 
   public static useAsync(
@@ -186,8 +156,6 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
     const tmpClosure = (): void => {
       closure();
     };
@@ -195,10 +163,6 @@ export class Hook {
     const effect = new Effect(tmpClosure, params);
 
     hookster.addEffect(effect);
-
-    hookster.setValue(index, null);
-
-    hookster.increment();
   }
 
   public static useLifecycle<K extends keyof HooksterSignatures>(
@@ -211,13 +175,7 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const index = hookster.index;
-
     hookster.on(name, listener);
-
-    hookster.setValue(index, null);
-
-    hookster.increment();
   }
 
   public static useContext<B>(
