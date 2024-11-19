@@ -48,6 +48,8 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
 
   private updateTimeout: number | undefined;
 
+  private updateQueued: boolean = false;
+
   private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
   public activate(): void {
@@ -92,7 +94,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   }
 
   public needsUpdate(): boolean {
-    return this.nextValues.size !== 0;
+    return this.updateQueued;
   }
 
   public update(): UpdatePromise {
@@ -108,7 +110,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
       return new UpdatePromise(false);
     }
 
-    if (!this.needsUpdate()) {
+    if (!this.updateQueued) {
       const currentValue = this.values[index];
 
       const equal = Comparer.compare(value, currentValue);
@@ -129,6 +131,8 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.updateTimeout = setTimeout((): void => {
       this.emit("rerender");
     });
+
+    this.updateQueued = true;
 
     const promise = new UpdatePromise(null);
 
@@ -164,6 +168,8 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.updateId = this.nextUpdateId;
 
     this.nextUpdateId++;
+
+    this.updateQueued = false;
 
     this.replaceUpdate();
   }

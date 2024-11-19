@@ -23,10 +23,12 @@ export abstract class Stateful<
 
   private updateTimeout: number | undefined;
 
+  private updateQueued: boolean = false;
+
   private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
   public needsUpdate(): boolean {
-    return this.nextState !== null;
+    return this.updateQueued;
   }
 
   protected update(): UpdatePromise {
@@ -34,7 +36,7 @@ export abstract class Stateful<
   }
 
   protected updateState(state: Partial<L>): UpdatePromise {
-    if (!this.needsUpdate()) {
+    if (!this.updateQueued) {
       const tmpState = { ...this.state, ...state };
 
       const equal = Comparer.compare(tmpState, this.state);
@@ -55,6 +57,8 @@ export abstract class Stateful<
     this.updateTimeout = setTimeout((): void => {
       this.startUpdate();
     });
+
+    this.updateQueued = true;
 
     const promise = new UpdatePromise(null);
 
@@ -97,6 +101,8 @@ export abstract class Stateful<
     this.updateId = this.nextUpdateId;
 
     this.nextUpdateId++;
+
+    this.updateQueued = false;
 
     this.replaceUpdate();
   }
