@@ -129,21 +129,15 @@ export class Slot<K extends Props = DefaultProps> {
   ) {
     children = Slot.parseChildren(children);
 
-    const tmpContentType: any = contentType;
+    this.contentType = contentType;
+    this.attributes = attributes;
 
-    if (
-      tmpContentType !== null &&
-      (tmpContentType.prototype === Component ||
-        tmpContentType.prototype instanceof Component ||
-        typeof tmpContentType === "function")
-    ) {
+    if (this.isClass() || this.isFunction()) {
       this.propsChildren = children;
 
       children = [];
     }
 
-    this.contentType = contentType;
-    this.attributes = attributes;
     this.children = children;
   }
 
@@ -157,6 +151,10 @@ export class Slot<K extends Props = DefaultProps> {
 
   public getChildren(): any[] {
     return this.children;
+  }
+
+  public getPropsChildren(): any[] | null {
+    return this.propsChildren;
   }
 
   public setChildren(children: any): void {

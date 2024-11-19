@@ -5,6 +5,7 @@ import { Stateful } from "./Stateful/Stateful";
 import { Persistor } from "./Persistor";
 import { Ref } from "./Ref";
 import { Var } from "./Var";
+import { Slot } from "./Slot";
 
 export class Comparer {
   /*
@@ -59,6 +60,46 @@ export class Comparer {
       a instanceof Animation
     ) {
       return a === b;
+    }
+
+    // for slots, check properties
+
+    if (a instanceof Slot) {
+      if (!(b instanceof Slot)) {
+        return false;
+      }
+
+      const aContentType = a.getContentType();
+      const bContentType = b.getContentType();
+
+      if (!Comparer.compare(aContentType, bContentType)) {
+        return false;
+      }
+
+      const aAttributes = a.getAttributes();
+      const bAttributes = b.getAttributes();
+
+      if (!Comparer.compare(aAttributes, bAttributes)) {
+        return false;
+      }
+
+      if (a.isClass() || a.isFunction()) {
+        const aPropsChildren = a.getPropsChildren();
+        const bPropsChildren = b.getPropsChildren();
+
+        if (!Comparer.compare(aPropsChildren, bPropsChildren)) {
+          return false;
+        }
+      } else {
+        const aChildren = a.getChildren();
+        const bChildren = b.getChildren();
+
+        if (!Comparer.compare(aChildren, bChildren)) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
     // for arrays, compare items deeply
