@@ -25,12 +25,16 @@ export abstract class Stateful<
 
   private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
+  public needsUpdate(): boolean {
+    return this.nextState !== null;
+  }
+
   protected update(): UpdatePromise {
     return this.queueUpdate();
   }
 
   protected updateState(state: Partial<L>): UpdatePromise {
-    if (this.nextState === null) {
+    if (!this.needsUpdate()) {
       const tmpState = { ...this.state, ...state };
 
       const equal = Comparer.compare(tmpState, this.state);

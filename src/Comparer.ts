@@ -1,3 +1,11 @@
+import { Animation } from "./Animation/Animation";
+
+import { Stateful } from "./Stateful/Stateful";
+
+import { Persistor } from "./Persistor";
+import { Ref } from "./Ref";
+import { Var } from "./Var";
+
 export class Comparer {
   /*
 
@@ -39,6 +47,18 @@ export class Comparer {
 
     if (a === null) {
       return b === null;
+    }
+
+    // for internal objects, check equality
+
+    if (
+      a instanceof Stateful ||
+      a instanceof Ref ||
+      a instanceof Var ||
+      a instanceof Persistor ||
+      a instanceof Animation
+    ) {
+      return a === b;
     }
 
     // for arrays, compare items deeply

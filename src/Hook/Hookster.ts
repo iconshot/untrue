@@ -91,6 +91,10 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.index++;
   }
 
+  public needsUpdate(): boolean {
+    return this.nextValues.size !== 0;
+  }
+
   public update(): UpdatePromise {
     if (this.unmounted) {
       return new UpdatePromise(false);
@@ -104,7 +108,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
       return new UpdatePromise(false);
     }
 
-    if (this.nextValues.size === 0) {
+    if (!this.needsUpdate()) {
       const currentValue = this.values[index];
 
       const equal = Comparer.compare(value, currentValue);
