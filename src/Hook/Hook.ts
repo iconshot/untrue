@@ -98,7 +98,7 @@ export class Hook {
     return animation;
   }
 
-  public static useMemo<K>(closure: () => K, params: any[] = []): K {
+  public static useMemo<K>(callback: () => K, params: any[] = []): K {
     const hookster = this.activeHookster;
 
     if (hookster === null) {
@@ -124,15 +124,22 @@ export class Hook {
       }
     }
 
-    memo ??= { value: closure(), params };
+    memo ??= { value: callback(), params };
 
     hookster.addValue(memo);
 
     return memo.value;
   }
 
+  public static useCallback<K, T extends any[] = any[]>(
+    callback: (...args: T) => K,
+    params: any[] = []
+  ): (...args: T) => K {
+    return Hook.useMemo((): ((...args: T) => K) => callback, params);
+  }
+
   public static useEffect(
-    closure: () => void | (() => void),
+    callback: () => void | (() => void),
     params: any[] | null = null
   ): void {
     const hookster = this.activeHookster;
@@ -141,13 +148,13 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const effect = new Effect(closure, params);
+    const effect = new Effect(callback, params);
 
     hookster.addEffect(effect);
   }
 
   public static useAsync(
-    closure: () => Promise<void>,
+    callback: () => Promise<void>,
     params: any[] | null = null
   ): void {
     const hookster = this.activeHookster;
@@ -157,7 +164,7 @@ export class Hook {
     }
 
     const tmpClosure = (): void => {
-      closure();
+      callback();
     };
 
     const effect = new Effect(tmpClosure, params);

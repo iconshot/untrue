@@ -61,10 +61,10 @@ export class Wrapper {
 
   public static wrapProps<A extends Props, B>(
     Child: ComponentType<A & B>,
-    closure: (props: PropsNoChildren<A>) => B | null
+    callback: (props: PropsNoChildren<A>) => B | null
   ): (props: A) => Slot<A & B> | null {
     return function WrappedProps({ children, ...props }: A) {
-      const result = closure(props);
+      const result = callback(props);
 
       if (result === null) {
         return null;

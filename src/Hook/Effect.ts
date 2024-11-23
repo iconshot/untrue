@@ -16,7 +16,7 @@ although this is configurable, we expect this to be the default behavior
 
 hook effects are supposed to be an alternative to component events
 so we need to use Emitter here too,
-to run the closures and the cleanups
+to run the callbacks and the cleanups
 
 in other words, using Emitter here,
 an error thrown in an effect won't affect another effect
@@ -27,13 +27,13 @@ export class Effect extends Emitter<EffectSignatures> {
   private cleanup: (() => void) | null = null;
 
   constructor(
-    private closure: () => void | (() => void),
+    private callback: () => void | (() => void),
     private params: any[] | null
   ) {
     super();
 
     this.on("run", (): void => {
-      this.cleanup = this.closure() ?? null;
+      this.cleanup = this.callback() ?? null;
     });
 
     this.on("cleanUp", (): void => {
