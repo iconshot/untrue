@@ -133,7 +133,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     clearTimeout(this.updateTimeout);
 
     this.updateTimeout = setTimeout((): void => {
-      this.emit("rerender");
+      this.startUpdate();
     });
 
     this.updateQueued = true;
@@ -151,6 +151,10 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     promises.push(promise);
 
     return promise;
+  }
+
+  private startUpdate(): void {
+    this.emit("rerender");
   }
 
   public performUpdate(): void {
