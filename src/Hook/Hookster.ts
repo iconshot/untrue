@@ -52,6 +52,10 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
 
   private updatePromises: Map<number, UpdatePromise[]> = new Map();
 
+  public initialize(listener: () => void): void {
+    this.on("rerender", listener);
+  }
+
   public activate(): void {
     Hook.activeHookster = this;
   }
@@ -226,11 +230,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     });
   }
 
-  public triggerRender(listener: () => void): void {
-    this.off("rerender");
-
-    this.on("rerender", listener);
-
+  public triggerRender(): void {
     if (!this.mounted) {
       this.triggerMount();
     } else {

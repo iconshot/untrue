@@ -33,6 +33,14 @@ export class Component<
     this.props = props;
   }
 
+  public initialize(listener: () => void): void {
+    const self = this as Stateful<L, AllComponentSignatures>;
+
+    self.on("rerender", listener);
+
+    this.init();
+  }
+
   public init(): void {}
 
   // override update
@@ -79,15 +87,9 @@ export class Component<
     this.nextProps = null;
   }
 
-  // triggerRender will be called by a renderer abstraction
+  // triggerRender will be called by a Tree abstraction
 
-  public triggerRender(listener: () => void): void {
-    const self = this as Stateful<L, AllComponentSignatures>;
-
-    self.off("rerender");
-
-    self.on("rerender", listener);
-
+  public triggerRender(): void {
     if (!this.mounted) {
       this.triggerMount();
     } else {
@@ -116,7 +118,5 @@ export class Component<
     this.emit("mount");
   }
 
-  public render(): any {
-    return [];
-  }
+  public render(): any {}
 }
