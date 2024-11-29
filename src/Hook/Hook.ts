@@ -117,7 +117,7 @@ export class Hook {
     let memo: Memo | null = null;
 
     if (prevMemo !== null) {
-      const equal = Hook.compare(params, prevMemo.params);
+      const equal = this.compare(params, prevMemo.params);
 
       if (equal) {
         memo = { value: prevMemo.value, params };
@@ -135,7 +135,36 @@ export class Hook {
     callback: (...args: T) => K,
     params: any[] = []
   ): (...args: T) => K {
-    return Hook.useMemo((): ((...args: T) => K) => callback, params);
+    return this.useMemo((): ((...args: T) => K) => callback, params);
+  }
+
+  public static useLifecycle<K extends keyof HooksterSignatures>(
+    name: K,
+    listener: () => any
+  ): void {
+    const hookster = this.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    hookster.on(name, listener);
+  }
+
+  public static useMountLifecycle(listener: () => any) {
+    this.useLifecycle("mount", listener);
+  }
+
+  public static useUnmountLifecycle(listener: () => any) {
+    this.useLifecycle("unmount", listener);
+  }
+
+  public static useUpdateLifecycle(listener: () => any) {
+    this.useLifecycle("update", listener);
+  }
+
+  public static useRenderLifecycle(listener: () => any) {
+    this.useLifecycle("render", listener);
   }
 
   public static useEffect(
@@ -153,36 +182,32 @@ export class Hook {
     hookster.addEffect(effect);
   }
 
-  public static useAsync(
+  public static useMountEffect(callback: () => void | (() => void)): void {
+    this.useEffect(callback, []);
+  }
+
+  public static useUpdateEffect(
+    callback: () => void | (() => void),
+    params: any[] | null = null
+  ): void {
+    const mountedVar = this.useVar(false);
+
+    this.useEffect((): void | (() => void) => {
+      if (mountedVar.value) {
+        return callback();
+      }
+
+      mountedVar.value = true;
+    }, params);
+  }
+
+  public static useAsyncEffect(
     callback: () => Promise<void>,
     params: any[] | null = null
   ): void {
-    const hookster = this.activeHookster;
-
-    if (hookster === null) {
-      throw new Error("Hook not available.");
-    }
-
-    const tmpClosure = (): void => {
+    this.useEffect((): void => {
       callback();
-    };
-
-    const effect = new Effect(tmpClosure, params);
-
-    hookster.addEffect(effect);
-  }
-
-  public static useLifecycle<K extends keyof HooksterSignatures>(
-    name: K,
-    listener: () => any
-  ): void {
-    const hookster = this.activeHookster;
-
-    if (hookster === null) {
-      throw new Error("Hook not available.");
-    }
-
-    hookster.on(name, listener);
+    }, params);
   }
 
   public static useContext<B>(
@@ -191,19 +216,19 @@ export class Hook {
   ): B {
     const contexts = Array.isArray(context) ? context : [context];
 
-    const update = Hook.useUpdate();
+    const update = this.useUpdate();
 
-    const selectorVar = Hook.useVar<() => B>(selector);
+    const selectorVar = this.useVar<() => B>(selector);
 
     selectorVar.value = selector;
 
     const result = selector();
 
-    const resultVar = Hook.useVar<B>(result);
+    const resultVar = this.useVar<B>(result);
 
     resultVar.value = result;
 
-    Hook.useEffect((): (() => void) => {
+    this.useEffect((): (() => void) => {
       let timeout: number | undefined;
 
       const listener = (): void => {
@@ -243,7 +268,7 @@ export class Hook {
   /*
 
   Comparer.compare does a deep comparison
-  while Hook.compare does a simpler shallow comparison
+  while this.compare does a simpler shallow comparison
   based on "params" used in useEffect, useMemo, etc
 
   */
