@@ -72,7 +72,7 @@ export class Comparer {
       const aContentType = a.getContentType();
       const bContentType = b.getContentType();
 
-      if (!Comparer.compare(aContentType, bContentType)) {
+      if (aContentType !== bContentType) {
         return false;
       }
 
