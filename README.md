@@ -43,35 +43,23 @@ More on `App` in the next section.
 A component state can change at any time and Untrue knows which nodes should be updated in the DOM.
 
 ```ts
-import $, { Component, Props, State } from "untrue";
+import $, { Hook } from "untrue";
 
-interface AppState extends State {
-  counter: number;
-}
+function App() {
+  const [counter, updateCounter] = Hook.useState(0);
 
-class App extends Component<Props, AppState> {
-  init(): void {
-    this.state = { counter: 0 };
-  }
-
-  onIncrement = (): void => {
-    const { counter } = this.state;
-
-    this.updateState({ counter: counter + 1 });
+  const onIncrement = () => {
+    updateCounter(counter + 1);
   };
 
-  render(): any {
-    // after the first click, counter is no longer 0 but 1
+  // regular arrays are used to return a list of slots
 
-    const { counter } = this.state;
+  // after the first click, counter is no longer 0 but 1
 
-    // regular arrays are used to return multiple slots
-
-    return [
-      $("span", counter),
-      $("button", { onclick: this.onIncrement }, "increment"),
-    ];
-  }
+  return [
+    $("span", counter),
+    $("button", { onclick: onIncrement }, "increment"),
+  ];
 }
 
 export default App;
@@ -92,9 +80,9 @@ The output HTML will be:
 Components can be classes or functions and are used to group multiple slots.
 
 ```ts
-import $, { Component, Props, State } from "untrue";
+import $, { Hook, Props } from "untrue";
 
-function App(): any {
+function App() {
   return [
     $(Header, { title: "Untrue" }), // pass title as prop (external data)
     $(Footer, { year: 2049 }), // pass year as prop (external data)
@@ -105,42 +93,31 @@ interface HeaderProps extends Props {
   title: string;
 }
 
-interface HeaderState extends State {
-  counter: number;
-}
+function Header({ title }: HeaderProps) {
+  const [counter, updateCounter] = Hook.useState(0); // internal data
 
-class Header extends Component<HeaderProps, HeaderState> {
-  init(): void {
-    this.state = { counter: 0 };
-  }
-
-  onIncrement = (): void => {
-    const { counter } = this.state;
-
-    this.updateState({ counter: counter + 1 });
+  const onIncrement = () => {
+    updateCounter(counter + 1);
   };
 
-  render(): any {
-    const { title } = this.props; // external data
-
-    const { counter } = this.state; // internal data
-
-    return $("header", [
-      $("h1", title),
+  return $("header", [
+    $("h1", title),
+    $("div", [
       $("span", counter),
-      $("button", { onclick: this.onIncrement }, "increment"),
-    ]);
-  }
+      $("button", { onclick: onIncrement }, "increment"),
+    ]),
+  ]);
 }
 
 interface FooterProps extends Props {
   year: number;
 }
 
-function Footer({ year }: FooterProps): any {
+function Footer({ year }: FooterProps) {
   return $("footer", [
     $("span", `copyright, ${year}`),
-    $("a", { href: "https://example.com" }, "follow me"),
+    $("br"),
+    $("a", { href: "https://example.com" }, "some anchor link"),
   ]);
 }
 
@@ -152,16 +129,19 @@ The output HTML will be:
 ```html
 <header>
   <h1>Untrue</h1>
-  <span>0</span>
-  <button>increment</button>
+  <div>
+    <span>0</span>
+    <button>increment</button>
+  </div>
 </header>
 <footer>
   <span>copyright, 2049</span>
-  <a href="https://example.com">follow me</a>
+  <br />
+  <a href="https://example.com">some anchor link</a>
 </footer>
 ```
 
-`Header` will be stateful while `Footer` will be stateless. Both components receive `props`.
+`Header` has some `counter` that will be updated with `button`.
 
 ### Lifecycle events
 
@@ -173,83 +153,44 @@ The output HTML will be:
 Multiple event listeners can be attached to a single event. Specially useful to have more organized code.
 
 ```ts
-import $, { Component, Props, State } from "untrue";
+import $, { Hook } from "untrue";
 
-interface TimerState extends State {
-  counter: number;
-}
+function App() {
+  const [running, updateRunning] = Hook.useState(false);
 
-class Timer extends Component<Props, TimerState> {
-  init(): void {
-    this.state = { counter: 0 };
-
-    let interval: number | undefined;
-
-    // start interval on mount
-
-    this.on("mount", () => {
-      interval = setInterval((): void => {
-        const { counter } = this.state;
-
-        this.updateState({ counter: counter + 1 });
-      }, 1000);
-    });
-
-    // clear interval on unmount
-
-    this.on("unmount", (): void => {
-      clearInterval(interval);
-    });
-
-    // check "counter" change on update
-
-    this.on("update", (): void => {
-      // this.props and this.prevProps are also available
-
-      const { counter } = this.state;
-      const { counter: prevCounter } = this.prevState!;
-
-      if (counter !== prevCounter) {
-        console.log("Counter has been updated.", { counter, prevCounter });
-      }
-    });
-  }
-
-  render(): any {
-    const { counter } = this.state;
-
-    return $("span", counter);
-  }
-}
-
-interface AppState extends State {
-  running: boolean;
-}
-
-class App extends Component<Props, AppState> {
-  init(): void {
-    this.state = { running: false };
-  }
-
-  onClick = (): void => {
-    const { running } = this.state;
-
-    this.updateState({ running: !running });
+  const onClick = () => {
+    updateRunning(!running);
   };
 
-  render(): any {
-    const { running } = this.state;
+  return [
+    $("button", { onclick: onClick }, running ? "end timer" : "start timer"),
+    $("br"),
+    running ? $(Timer) : null,
+  ];
+}
 
-    return [
-      $(
-        "button",
-        { onclick: this.onClick },
-        running ? "end timer" : "start timer"
-      ),
-      $("br"),
-      running ? $(Timer) : null,
-    ];
-  }
+function Timer() {
+  const [counter, updateCounter] = Hook.useState(0);
+
+  Hook.useEffect(() => {
+    const timeout = setTimeout(() => {
+      updateCounter(counter + 1);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [counter]);
+
+  Hook.useMountLifecycle(() => {
+    console.log("Timer mounted");
+  });
+
+  Hook.useUpdateLifecycle(() => {
+    console.log("Timer updated");
+  });
+
+  return $("span", counter);
 }
 
 export default App;
@@ -263,4 +204,6 @@ After the button click, the output HTML will be:
 <span>0</span>
 ```
 
-A `console.log` happens every second because `interval` updates `counter` on every call.
+`counter` is incremented every second.
+
+"Timer mounted" is logged first followed by "Timer updated" for updates.
