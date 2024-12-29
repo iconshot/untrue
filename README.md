@@ -172,6 +172,14 @@ function App() {
 function Timer() {
   const [counter, updateCounter] = Hook.useState(0);
 
+  Hook.useMountLifecycle(() => {
+    console.log("Timer mounted");
+  });
+
+  Hook.useUpdateLifecycle(() => {
+    console.log("Timer updated");
+  });
+
   Hook.useEffect(() => {
     const timeout = setTimeout(() => {
       updateCounter(counter + 1);
@@ -181,14 +189,6 @@ function Timer() {
       clearTimeout(timeout);
     };
   }, [counter]);
-
-  Hook.useMountLifecycle(() => {
-    console.log("Timer mounted");
-  });
-
-  Hook.useUpdateLifecycle(() => {
-    console.log("Timer updated");
-  });
 
   return $("span", counter);
 }
@@ -206,4 +206,4 @@ After the button click, the output HTML will be:
 
 `counter` is incremented every second.
 
-"Timer mounted" is logged first followed by "Timer updated" for updates.
+`Timer mounted` is logged first followed by `Timer updated` for updates.
