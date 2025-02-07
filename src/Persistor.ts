@@ -69,7 +69,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
       PersistorProviderProps,
       PersistorProviderState
     > {
-      public init(): void {
+      public override init(): void {
         this.state = { loading: true, error: false };
 
         // init the Persistor on mount
@@ -87,7 +87,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
         });
       }
 
-      public render(): any {
+      public override render(): any {
         const {
           loadingChildren = null,
           errorChildren = null,
@@ -122,9 +122,9 @@ export class Persistor extends Emitter<PersistorSignatures> {
       data = this.migrate(content.data, content.version);
     }
 
-    this.bindContexts();
-
     this.hydrateContexts(data);
+
+    this.bindContexts();
 
     /*
     
@@ -136,6 +136,20 @@ export class Persistor extends Emitter<PersistorSignatures> {
     await this.persist();
 
     this.emit("init");
+  }
+
+  // hydrate contexts with the right data
+
+  private hydrateContexts(data: StorageContent["data"]): void {
+    for (const key in this.contexts) {
+      const context = this.contexts[key];
+
+      if (key in data) {
+        const value = data[key];
+
+        context.hydrate(value);
+      }
+    }
   }
 
   // listen to context updates
@@ -155,20 +169,6 @@ export class Persistor extends Emitter<PersistorSignatures> {
       const context = this.contexts[key];
 
       context.on("update", listener);
-    }
-  }
-
-  // hydrate contexts with the right data
-
-  private hydrateContexts(data: StorageContent["data"]): void {
-    for (const key in this.contexts) {
-      const context = this.contexts[key];
-
-      if (key in data) {
-        const value = data[key];
-
-        context.hydrate(value);
-      }
     }
   }
 

@@ -132,9 +132,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   private queueUpdate(): UpdatePromise {
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout((): void => {
-      this.startUpdate();
-    });
+    this.updateTimeout = setTimeout((): void => this.startUpdate());
 
     this.updateQueued = true;
 
@@ -201,9 +199,7 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
       return;
     }
 
-    promises.forEach((promise): void => {
-      promise.settle(value);
-    });
+    promises.forEach((promise): void => promise.settle(value));
 
     this.updatePromises.delete(updateId);
   }
@@ -229,45 +225,43 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   }
 
   private cleanUpEffects(): void {
-    this.effects.forEach((effect): void => {
-      effect.cleanUp();
-    });
+    this.effects.forEach((effect): void => effect.cleanUp());
   }
 
-  public triggerRender(): void {
+  public finishRender(): void {
     if (!this.mounted) {
-      this.triggerMount();
+      this.finishMount();
     } else {
-      this.triggerUpdate();
+      this.finishUpdate();
     }
 
-    this.emit("render");
+    setTimeout((): void => this.emit("render"));
 
-    this.runEffects();
+    setTimeout((): void => this.runEffects());
   }
 
-  public triggerUnmount(): void {
+  private finishMount(): void {
+    this.mounted = true;
+
+    setTimeout((): void => this.emit("mount"));
+  }
+
+  private finishUpdate(): void {
+    setTimeout((): void => this.settleUpdate(true));
+
+    setTimeout((): void => this.emit("update"));
+  }
+
+  public finishUnmount(): void {
     this.off("rerender");
 
     this.mounted = false;
     this.unmounted = true;
 
-    this.settleNextUpdate(false);
+    setTimeout((): void => this.settleNextUpdate(false));
 
-    this.emit("unmount");
+    setTimeout((): void => this.emit("unmount"));
 
-    this.cleanUpEffects();
-  }
-
-  private triggerMount(): void {
-    this.mounted = true;
-
-    this.emit("mount");
-  }
-
-  private triggerUpdate(): void {
-    this.settleUpdate(true);
-
-    this.emit("update");
+    setTimeout((): void => this.cleanUpEffects());
   }
 }

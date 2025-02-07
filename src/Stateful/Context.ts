@@ -19,18 +19,18 @@ export class Context<L extends State = State, M = any> extends Stateful<
 
   // override update
 
-  public update(): UpdatePromise {
+  public override update(): UpdatePromise {
     return super.update();
   }
 
-  public updateState(state: Partial<L>): UpdatePromise {
+  public override updateState(state: Partial<L>): UpdatePromise {
     return super.updateState(state);
   }
 
   /*
 
   in Component, the startUpdate will emit a "rerender" event for the tree
-  and then the Tree will separate performUpdate (updateProps) from triggerUpdate (triggerRender)
+  and then the Tree will separate performUpdate (updateProps) from finishUpdate (finishRender)
   because that's how it needs to work,
 
   in Context, however, we don't depend on a Tree
@@ -41,9 +41,9 @@ export class Context<L extends State = State, M = any> extends Stateful<
 
   */
 
-  protected startUpdate(): void {
+  protected override startUpdate(): void {
     this.performUpdate();
 
-    this.triggerUpdate();
+    this.finishUpdate();
   }
 }

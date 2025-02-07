@@ -268,7 +268,7 @@ export class Hook {
   /*
 
   Comparer.compare does a deep comparison
-  while this.compare does a simpler shallow comparison
+  while Hook.compare does a simpler shallow comparison
   based on "params" used in useEffect, useMemo, etc
 
   */

@@ -13,7 +13,7 @@ export abstract class Stateful<
   L extends State,
   M extends StatefulSignatures
 > extends Emitter<M> {
-  protected state: L;
+  protected state: L = {} as L;
 
   protected prevState: L | null = null;
   protected nextState: L | null = null;
@@ -54,9 +54,7 @@ export abstract class Stateful<
   private queueUpdate(): UpdatePromise {
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout((): void => {
-      this.startUpdate();
-    });
+    this.updateTimeout = setTimeout((): void => this.startUpdate());
 
     this.updateQueued = true;
 
@@ -119,13 +117,13 @@ export abstract class Stateful<
 
   /*
 
-  when settleUpdate comes from triggerUpdate
+  when settleUpdate comes from finishUpdate
   we want to settle promises for this.updateId
   because performUpdate has been called already
   so this.updateId will changed to the previous this.nextUpdateId
 
   however, in the Component class
-  settleUpdate may come from triggerUnmount,
+  settleUpdate may come from finishUnmount,
   in that case the updateId hasn't been changed
   because it never gets to performUpdate,
   so we want to settle promises for this.nextUpdateId instead
@@ -150,9 +148,7 @@ export abstract class Stateful<
       return;
     }
 
-    promises.forEach((promise): void => {
-      promise.settle(value);
-    });
+    promises.forEach((promise): void => promise.settle(value));
 
     this.updatePromises.delete(updateId);
   }
@@ -165,11 +161,11 @@ export abstract class Stateful<
     this.settleUpdatePromises(this.nextUpdateId, value);
   }
 
-  protected triggerUpdate(): void {
+  protected finishUpdate(): void {
     const self = this as Stateful<L, StatefulSignatures>;
 
-    this.settleUpdate(true);
+    setTimeout((): void => this.settleUpdate(true));
 
-    self.emit("update");
+    setTimeout((): void => self.emit("update"));
   }
 }

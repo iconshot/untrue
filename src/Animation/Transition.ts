@@ -5,7 +5,7 @@ import { Animation } from "./Animation";
 import { AnimationFrame } from "./AnimationFrame";
 
 type TransitionSignatures = {
-  start: () => void;
+  play: () => void;
   pause: () => void;
   end: () => void;
   cancel: () => void;
@@ -31,7 +31,7 @@ export class Transition extends Emitter<TransitionSignatures> {
     this.initialValue = animation.getValue();
   }
 
-  public start(): void {
+  public play(): void {
     if (this.canceled) {
       return;
     }
@@ -71,7 +71,7 @@ export class Transition extends Emitter<TransitionSignatures> {
 
     this.frame = AnimationFrame.request(callback);
 
-    this.emit("start");
+    this.emit("play");
   }
 
   public pause(): void {

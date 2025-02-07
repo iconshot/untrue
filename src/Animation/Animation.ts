@@ -42,9 +42,7 @@ export class Animation extends Emitter<AnimationSignatures> {
 
     // a setTimeout is needed so the caller can add a "start" event handler
 
-    setTimeout((): void => {
-      transition.start();
-    });
+    setTimeout((): void => transition.play());
 
     this.transition = transition;
 

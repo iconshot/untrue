@@ -27,11 +27,11 @@ class PublicComponent<K extends Props, L extends State> extends Component<
 
   public mounted: boolean = false;
 
-  public update(): UpdatePromise {
+  public override update(): UpdatePromise {
     return super.update();
   }
 
-  public updateState(state: Partial<L>): UpdatePromise {
+  public override updateState(state: Partial<L>): UpdatePromise {
     return super.updateState(state);
   }
 }
@@ -43,13 +43,13 @@ export class Wrapper {
     ) => ((props: K, state: L) => any) | null | void
   ): ClassComponent<K> {
     return class WrappedComponent extends PublicComponent<K, L> {
-      private renderClosure: ((props: K, state: L) => any) | null;
+      private renderClosure: ((props: K, state: L) => any) | null = null;
 
-      public init(): void {
+      public override init(): void {
         this.renderClosure = initClosure(this) ?? null;
       }
 
-      public render(): any {
+      public override render(): any {
         if (this.renderClosure === null) {
           return null;
         }
@@ -88,7 +88,7 @@ export class Wrapper {
     return class WrappedContext extends Component<A> {
       private result: B | null = null;
 
-      public init(): void {
+      public override init(): void {
         let timeout: number | undefined;
 
         const listener = (): void => {
@@ -151,7 +151,7 @@ export class Wrapper {
         this.update();
       }
 
-      public render(): any {
+      public override render(): any {
         const { children, ...props } = this.props;
 
         this.result = this.select(); // it handles both update() calls and new props
