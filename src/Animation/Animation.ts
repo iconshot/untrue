@@ -239,15 +239,15 @@ export class Animation extends Emitter<AnimationSignatures> {
   }
 
   public bind(component: Component, listener: () => void): void {
-    component.on("mount", (): void => {
+    component.on("beforeMount", (): void => {
       this.on("update", listener);
     });
 
-    component.on("unmount", (): void => {
+    component.on("beforeUnmount", (): void => {
       this.off("update", listener);
     });
 
-    component.on("render", listener);
+    component.on("beforeRender", listener);
   }
 
   public use(listener: () => void): void {
@@ -255,7 +255,7 @@ export class Animation extends Emitter<AnimationSignatures> {
 
     listenerVar.value = listener;
 
-    Hook.useEffect((): (() => void) => {
+    Hook.useBeforeEffect((): (() => void) => {
       const tmpListener = (): void => {
         const listener = listenerVar.value;
 
@@ -269,6 +269,6 @@ export class Animation extends Emitter<AnimationSignatures> {
       };
     }, []);
 
-    Hook.useEffect(listener);
+    Hook.useBeforeEffect(listener);
   }
 }

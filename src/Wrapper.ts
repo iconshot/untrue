@@ -42,7 +42,7 @@ export class Wrapper {
       self: PublicComponent<K, L>
     ) => ((props: K, state: L) => any) | null | void
   ): ClassComponent<K> {
-    return class WrappedComponent extends PublicComponent<K, L> {
+    return class ComponentWrapper extends PublicComponent<K, L> {
       private renderClosure: ((props: K, state: L) => any) | null = null;
 
       public override init(): void {
@@ -63,7 +63,7 @@ export class Wrapper {
     Child: ComponentType<A & B>,
     callback: (props: PropsNoChildren<A>) => B | null
   ): (props: A) => Slot<A & B> | null {
-    return function WrappedProps({ children, ...props }: A) {
+    return function PropsWrapper({ children, ...props }: A) {
       const result = callback(props);
 
       if (result === null) {
@@ -85,7 +85,7 @@ export class Wrapper {
   ): ClassComponent<A> {
     const contexts = Array.isArray(context) ? context : [context];
 
-    return class WrappedContext extends Component<A> {
+    return class ContextWrapper extends Component<A> {
       private result: B | null = null;
 
       public override init(): void {
@@ -99,15 +99,15 @@ export class Wrapper {
           });
         };
 
-        this.on("mount", (): void => {
+        this.on("beforeMount", (): void => {
           for (const context of contexts) {
-            context.on("update", listener);
+            context.on("beforeUpdate", listener);
           }
         });
 
-        this.on("unmount", (): void => {
+        this.on("beforeUnmount", (): void => {
           for (const context of contexts) {
-            context.off("update", listener);
+            context.off("beforeUpdate", listener);
           }
         });
       }

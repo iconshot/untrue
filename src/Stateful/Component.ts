@@ -7,8 +7,11 @@ export interface Props {
 
 type ComponentSignatures = StatefulSignatures & {
   mount: () => any;
-  unmount: () => any;
   render: () => any;
+  unmount: () => any;
+  beforeMount: () => any;
+  beforeRender: () => any;
+  beforeUnmount: () => any;
 };
 
 type AllComponentSignatures = ComponentSignatures & {
@@ -110,19 +113,27 @@ export class Component<
   */
 
   public finishRender(): void {
-    if (!this.mounted) {
-      this.finishMount();
+    const mounted = this.mounted;
+
+    if (!mounted) {
+      this.mounted = true;
+
+      setTimeout((): void => this.emit("mount"));
     } else {
-      this.finishUpdate();
+      setTimeout((): void => this.settleUpdate(true));
+
+      setTimeout((): void => this.emit("update"));
     }
 
     setTimeout((): void => this.emit("render"));
-  }
 
-  private finishMount(): void {
-    this.mounted = true;
+    if (!mounted) {
+      this.emit("beforeMount");
+    } else {
+      this.emit("beforeUpdate");
+    }
 
-    setTimeout((): void => this.emit("mount"));
+    this.emit("beforeRender");
   }
 
   public finishUnmount(): void {
@@ -136,6 +147,8 @@ export class Component<
     setTimeout((): void => this.settleNextUpdate(false));
 
     setTimeout((): void => this.emit("unmount"));
+
+    this.emit("beforeUnmount");
   }
 
   public render(): any {}

@@ -155,16 +155,32 @@ export class Hook {
     this.useLifecycle("mount", listener);
   }
 
-  public static useUnmountLifecycle(listener: () => any) {
-    this.useLifecycle("unmount", listener);
-  }
-
   public static useUpdateLifecycle(listener: () => any) {
     this.useLifecycle("update", listener);
   }
 
   public static useRenderLifecycle(listener: () => any) {
     this.useLifecycle("render", listener);
+  }
+
+  public static useUnmountLifecycle(listener: () => any) {
+    this.useLifecycle("unmount", listener);
+  }
+
+  public static useBeforeMountLifecycle(listener: () => any) {
+    this.useLifecycle("beforeMount", listener);
+  }
+
+  public static useBeforeUpdateLifecycle(listener: () => any) {
+    this.useLifecycle("beforeUpdate", listener);
+  }
+
+  public static useBeforeRenderLifecycle(listener: () => any) {
+    this.useLifecycle("beforeRender", listener);
+  }
+
+  public static useBeforeUnmountLifecycle(listener: () => any) {
+    this.useLifecycle("beforeUnmount", listener);
   }
 
   public static useEffect(
@@ -210,6 +226,51 @@ export class Hook {
     }, params);
   }
 
+  public static useBeforeEffect(
+    callback: () => void | (() => void),
+    params: any[] | null = null
+  ): void {
+    const hookster = this.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    const effect = new Effect(callback, params);
+
+    hookster.addBeforeEffect(effect);
+  }
+
+  public static useBeforeMountEffect(
+    callback: () => void | (() => void)
+  ): void {
+    this.useBeforeEffect(callback, []);
+  }
+
+  public static useBeforeUpdateEffect(
+    callback: () => void | (() => void),
+    params: any[] | null = null
+  ): void {
+    const mountedVar = this.useVar(false);
+
+    this.useBeforeEffect((): void | (() => void) => {
+      if (mountedVar.value) {
+        return callback();
+      }
+
+      mountedVar.value = true;
+    }, params);
+  }
+
+  public static useBeforeAsyncEffect(
+    callback: () => Promise<void>,
+    params: any[] | null = null
+  ): void {
+    this.useBeforeEffect((): void => {
+      callback();
+    }, params);
+  }
+
   public static useContext<B>(
     context: Context | Context[],
     selector: () => B
@@ -228,7 +289,7 @@ export class Hook {
 
     resultVar.value = result;
 
-    this.useEffect((): (() => void) => {
+    this.useBeforeEffect((): (() => void) => {
       let timeout: number | undefined;
 
       const listener = (): void => {
@@ -241,7 +302,7 @@ export class Hook {
 
           const tmpResult = selector();
 
-          const equal = Comparer.compare(result, tmpResult);
+          const equal = Comparer.compare(tmpResult, result);
 
           if (equal) {
             return;
@@ -252,12 +313,12 @@ export class Hook {
       };
 
       for (const context of contexts) {
-        context.on("update", listener);
+        context.on("beforeUpdate", listener);
       }
 
       return (): void => {
         for (const context of contexts) {
-          context.off("update", listener);
+          context.off("beforeUpdate", listener);
         }
       };
     }, contexts);

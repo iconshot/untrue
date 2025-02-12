@@ -7,6 +7,7 @@ export interface State {}
 
 export type StatefulSignatures = {
   update: () => any;
+  beforeUpdate: () => any;
 };
 
 export abstract class Stateful<
@@ -159,13 +160,5 @@ export abstract class Stateful<
 
   protected settleNextUpdate(value: boolean): void {
     this.settleUpdatePromises(this.nextUpdateId, value);
-  }
-
-  protected finishUpdate(): void {
-    const self = this as Stateful<L, StatefulSignatures>;
-
-    setTimeout((): void => this.settleUpdate(true));
-
-    setTimeout((): void => self.emit("update"));
   }
 }
