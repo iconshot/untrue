@@ -99,15 +99,15 @@ export class Wrapper {
           });
         };
 
-        this.on("beforeMount", (): void => {
+        this.on("immediateMount", (): void => {
           for (const context of contexts) {
-            context.on("beforeUpdate", listener);
+            context.on("immediateUpdate", listener);
           }
         });
 
-        this.on("beforeUnmount", (): void => {
+        this.on("immediateUnmount", (): void => {
           for (const context of contexts) {
-            context.off("beforeUpdate", listener);
+            context.off("immediateUpdate", listener);
           }
         });
       }

@@ -48,19 +48,19 @@ export class Context<L extends State = State, M = any> extends Stateful<
 
   /*
 
-  we need to create the timeouts before emitting "beforeUpdate"  
+  we need to create the timeouts before emitting "immediateUpdate"  
   to ensure proper ordering of update events.
 
   why?
-  - if a "beforeUpdate" listener triggers an update or updateState call,  
+  - if an "immediateUpdate" listener triggers an update or updateState call,  
     the startUpdate() for that new update must happen **after** the "update"  
     event has been emitted for the initial update.
   - if we don't handle this correctly, startUpdate() for the second update  
     could run **before** the initial "update" event is fully processed.  
   - this would result in "update" listeners seeing a different state  
-    than what was present during the initial "beforeUpdate" event.
+    than what was present during the initial "immediateUpdate" event.
 
-  by setting timeouts before emitting "beforeUpdate,"  
+  by setting timeouts before emitting "immediateUpdate,"  
   we ensure updates are processed in the correct order.
 
   */
@@ -70,6 +70,6 @@ export class Context<L extends State = State, M = any> extends Stateful<
 
     setTimeout((): void => this.emit("update"));
 
-    this.emit("beforeUpdate");
+    this.emit("immediateUpdate");
   }
 }

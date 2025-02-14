@@ -9,9 +9,9 @@ type ComponentSignatures = StatefulSignatures & {
   mount: () => any;
   render: () => any;
   unmount: () => any;
-  beforeMount: () => any;
-  beforeRender: () => any;
-  beforeUnmount: () => any;
+  immediateMount: () => any;
+  immediateRender: () => any;
+  immediateUnmount: () => any;
 };
 
 type AllComponentSignatures = ComponentSignatures & {
@@ -104,7 +104,7 @@ export class Component<
   - suppose we have a flex item inside Component A.
   - when the "mount" lifecycle event for Component A is triggered, the subsequent flex items
     (possibly inside other components) might not yet be rendered by the Tree render process.
-  - if we try to access the offsetWidth of the flex item in Component A immediately (without a timeout),
+  - if we try to access offsetWidth of the flex item in Component A immediately (without a timeout),
     we might get 0 because other flex items that affect its dimensions may not yet be rendered.
 
   by deferring these actions with a timeout, we ensure all dependent elements are rendered,
@@ -128,12 +128,12 @@ export class Component<
     setTimeout((): void => this.emit("render"));
 
     if (!mounted) {
-      this.emit("beforeMount");
+      this.emit("immediateMount");
     } else {
-      this.emit("beforeUpdate");
+      this.emit("immediateUpdate");
     }
 
-    this.emit("beforeRender");
+    this.emit("immediateRender");
   }
 
   public finishUnmount(): void {
@@ -148,7 +148,7 @@ export class Component<
 
     setTimeout((): void => this.emit("unmount"));
 
-    this.emit("beforeUnmount");
+    this.emit("immediateUnmount");
   }
 
   public render(): any {}

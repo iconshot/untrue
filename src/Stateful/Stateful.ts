@@ -7,7 +7,7 @@ export interface State {}
 
 export type StatefulSignatures = {
   update: () => any;
-  beforeUpdate: () => any;
+  immediateUpdate: () => any;
 };
 
 export abstract class Stateful<
