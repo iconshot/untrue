@@ -270,19 +270,21 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   public finishRender(): void {
     const mounted = this.mounted;
 
-    if (!mounted) {
-      this.mounted = true;
+    this.mounted = true;
 
-      setTimeout((): void => this.emit("mount"));
-    } else {
-      setTimeout((): void => this.settleUpdate(true));
+    setTimeout((): void => {
+      if (!mounted) {
+        this.emit("mount");
+      } else {
+        this.settleUpdate(true);
 
-      setTimeout((): void => this.emit("update"));
-    }
+        this.emit("update");
+      }
 
-    setTimeout((): void => this.emit("render"));
+      this.emit("render");
 
-    setTimeout((): void => this.runEffects());
+      this.runEffects();
+    });
 
     if (!mounted) {
       this.emit("immediateMount");
@@ -301,11 +303,13 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.mounted = false;
     this.unmounted = true;
 
-    setTimeout((): void => this.settleNextUpdate(false));
+    setTimeout((): void => {
+      this.settleNextUpdate(false);
 
-    setTimeout((): void => this.emit("unmount"));
+      this.emit("unmount");
 
-    setTimeout((): void => this.cleanUpEffects());
+      this.cleanUpEffects();
+    });
 
     this.emit("immediateUnmount");
 

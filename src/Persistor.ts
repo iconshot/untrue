@@ -168,7 +168,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
     for (const key in this.contexts) {
       const context = this.contexts[key];
 
-      context.on("update", listener);
+      context.on("immediateUpdate", listener);
     }
   }
 

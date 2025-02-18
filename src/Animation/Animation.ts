@@ -255,20 +255,20 @@ export class Animation extends Emitter<AnimationSignatures> {
 
     listenerVar.value = listener;
 
-    Hook.useImmediateEffect((): (() => void) => {
-      const tmpListener = (): void => {
-        const listener = listenerVar.value;
+    const callback = Hook.useCallback(() => {
+      const listener = listenerVar.value;
 
-        listener();
-      };
+      listener();
+    });
 
-      this.on("update", tmpListener);
+    Hook.useImmediateMountLifecycle((): void => {
+      this.on("update", callback);
+    });
 
-      return (): void => {
-        this.off("update", tmpListener);
-      };
-    }, []);
+    Hook.useImmediateUnmountLifecycle((): void => {
+      this.off("update", callback);
+    });
 
-    Hook.useImmediateEffect(listener);
+    Hook.useImmediateRenderLifecycle(callback);
   }
 }

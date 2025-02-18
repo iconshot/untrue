@@ -48,7 +48,7 @@ export class Context<L extends State = State, M = any> extends Stateful<
 
   /*
 
-  we need to create the timeouts before emitting "immediateUpdate"  
+  we need to create a timeout before emitting "immediateUpdate"  
   to ensure proper ordering of update events.
 
   why?
@@ -60,15 +60,17 @@ export class Context<L extends State = State, M = any> extends Stateful<
   - this would result in "update" listeners seeing a different state  
     than what was present during the initial "immediateUpdate" event.
 
-  by setting timeouts before emitting "immediateUpdate,"  
+  by setting the timeout before emitting "immediateUpdate,"  
   we ensure updates are processed in the correct order.
 
   */
 
   private finishUpdate(): void {
-    setTimeout((): void => this.settleUpdate(true));
+    setTimeout((): void => {
+      this.settleUpdate(true);
 
-    setTimeout((): void => this.emit("update"));
+      this.emit("update");
+    });
 
     this.emit("immediateUpdate");
   }
