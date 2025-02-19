@@ -72,9 +72,9 @@ export class Persistor extends Emitter<PersistorSignatures> {
       public override init(): void {
         this.state = { loading: true, error: false };
 
-        // init the Persistor on immediateMount
+        // init the Persistor on mount
 
-        this.on("immediateMount", async (): Promise<void> => {
+        this.on("mount", async (): Promise<void> => {
           try {
             await self.init();
           } catch (error) {
@@ -168,7 +168,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
     for (const key in this.contexts) {
       const context = this.contexts[key];
 
-      context.on("immediateUpdate", listener);
+      context.on("update", listener);
     }
   }
 

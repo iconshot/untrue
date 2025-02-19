@@ -27,11 +27,11 @@ export class Var<K> extends Emitter<VarSignatures> {
   }
 
   public bind(component: Component, listener: () => void): void {
-    component.on("immediateMount", (): void => {
+    component.on("mount", (): void => {
       this.on("update", listener);
     });
 
-    component.on("immediateUnmount", (): void => {
+    component.on("unmount", (): void => {
       this.off("update", listener);
     });
   }
@@ -47,11 +47,11 @@ export class Var<K> extends Emitter<VarSignatures> {
       listener();
     });
 
-    Hook.useImmediateMountLifecycle((): void => {
+    Hook.useMountLifecycle((): void => {
       this.on("update", callback);
     });
 
-    Hook.useImmediateUnmountLifecycle((): void => {
+    Hook.useUnmountLifecycle((): void => {
       this.off("update", callback);
     });
   }

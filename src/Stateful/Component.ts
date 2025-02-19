@@ -9,9 +9,9 @@ type ComponentSignatures = StatefulSignatures & {
   mount: () => any;
   render: () => any;
   unmount: () => any;
-  immediateMount: () => any;
-  immediateRender: () => any;
-  immediateUnmount: () => any;
+  lateMount: () => any;
+  lateRender: () => any;
+  lateUnmount: () => any;
 };
 
 type AllComponentSignatures = ComponentSignatures & {
@@ -94,11 +94,11 @@ export class Component<
   
   finishRender will be called by a Tree abstraction
 
-  we use a timeout for emitting the "render" event (and any other lifecycle events)
-  to ensure the entire Tree render process is complete before performing actions on the DOM.
+  late lifecycle events are useful to ensure
+  the entire Tree render process is complete before performing actions on the DOM.
 
   this is important because some operations, like calling focus() on inputs or accessing offsetWidth,
-  require all elements in the component tree to be fully rendered.
+  require all elements in Tree to be fully rendered.
 
   for example:
   - suppose we have a flex item inside Component A.
@@ -119,23 +119,23 @@ export class Component<
 
     setTimeout((): void => {
       if (!mounted) {
-        this.emit("mount");
+        this.emit("lateMount");
       } else {
         this.settleUpdate(true);
 
-        this.emit("update");
+        this.emit("lateUpdate");
       }
 
-      this.emit("render");
+      this.emit("lateRender");
     });
 
     if (!mounted) {
-      this.emit("immediateMount");
+      this.emit("mount");
     } else {
-      this.emit("immediateUpdate");
+      this.emit("update");
     }
 
-    this.emit("immediateRender");
+    this.emit("render");
   }
 
   public finishUnmount(): void {
@@ -149,10 +149,10 @@ export class Component<
     setTimeout((): void => {
       this.settleNextUpdate(false);
 
-      this.emit("unmount");
+      this.emit("lateUnmount");
     });
 
-    this.emit("immediateUnmount");
+    this.emit("unmount");
   }
 
   public render(): any {}

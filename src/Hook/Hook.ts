@@ -167,20 +167,20 @@ export class Hook {
     this.useLifecycle("unmount", listener);
   }
 
-  public static useImmediateMountLifecycle(listener: () => any) {
-    this.useLifecycle("immediateMount", listener);
+  public static useLateMountLifecycle(listener: () => any) {
+    this.useLifecycle("lateMount", listener);
   }
 
-  public static useImmediateUpdateLifecycle(listener: () => any) {
-    this.useLifecycle("immediateUpdate", listener);
+  public static useLateUpdateLifecycle(listener: () => any) {
+    this.useLifecycle("lateUpdate", listener);
   }
 
-  public static useImmediateRenderLifecycle(listener: () => any) {
-    this.useLifecycle("immediateRender", listener);
+  public static useLateRenderLifecycle(listener: () => any) {
+    this.useLifecycle("lateRender", listener);
   }
 
-  public static useImmediateUnmountLifecycle(listener: () => any) {
-    this.useLifecycle("immediateUnmount", listener);
+  public static useLateUnmountLifecycle(listener: () => any) {
+    this.useLifecycle("lateUnmount", listener);
   }
 
   public static useEffect(
@@ -226,7 +226,7 @@ export class Hook {
     }, params);
   }
 
-  public static useImmediateEffect(
+  public static useLateEffect(
     callback: () => void | (() => void),
     params: any[] | null = null
   ): void {
@@ -238,22 +238,20 @@ export class Hook {
 
     const effect = new Effect(callback, params);
 
-    hookster.addImmediateEffect(effect);
+    hookster.addLateEffect(effect);
   }
 
-  public static useImmediateMountEffect(
-    callback: () => void | (() => void)
-  ): void {
-    this.useImmediateEffect(callback, []);
+  public static useLateMountEffect(callback: () => void | (() => void)): void {
+    this.useLateEffect(callback, []);
   }
 
-  public static useImmediateUpdateEffect(
+  public static useLateUpdateEffect(
     callback: () => void | (() => void),
     params: any[] | null = null
   ): void {
     const mountedVar = this.useVar(false);
 
-    this.useImmediateEffect((): void | (() => void) => {
+    this.useLateEffect((): void | (() => void) => {
       if (mountedVar.value) {
         return callback();
       }
@@ -262,11 +260,11 @@ export class Hook {
     }, params);
   }
 
-  public static useImmediateAsyncEffect(
+  public static useLateAsyncEffect(
     callback: () => Promise<void>,
     params: any[] | null = null
   ): void {
-    this.useImmediateEffect((): void => {
+    this.useLateEffect((): void => {
       callback();
     }, params);
   }
@@ -289,7 +287,7 @@ export class Hook {
 
     resultVar.value = result;
 
-    this.useImmediateEffect((): (() => void) => {
+    this.useEffect((): (() => void) => {
       let timeout: number | undefined;
 
       const listener = (): void => {
@@ -313,12 +311,12 @@ export class Hook {
       };
 
       for (const context of contexts) {
-        context.on("immediateUpdate", listener);
+        context.on("update", listener);
       }
 
       return (): void => {
         for (const context of contexts) {
-          context.off("immediateUpdate", listener);
+          context.off("update", listener);
         }
       };
     }, contexts);

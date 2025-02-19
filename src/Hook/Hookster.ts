@@ -11,10 +11,10 @@ export type HooksterSignatures = {
   update: () => any;
   render: () => any;
   unmount: () => any;
-  immediateMount: () => any;
-  immediateUpdate: () => any;
-  immediateRender: () => any;
-  immediateUnmount: () => any;
+  lateMount: () => any;
+  lateUpdate: () => any;
+  lateRender: () => any;
+  lateUnmount: () => any;
 };
 
 type AllHooksterSignatures = HooksterSignatures & {
@@ -44,9 +44,9 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
 
   private prevEffects: Effect[] | null = null;
 
-  private immediateEffects: Effect[] = [];
+  private lateEffects: Effect[] = [];
 
-  private prevImmediateEffects: Effect[] | null = null;
+  private prevLateEffects: Effect[] | null = null;
 
   private mounted: boolean = false;
   private unmounted: boolean = false;
@@ -83,8 +83,8 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     }
 
     if (
-      this.prevImmediateEffects !== null &&
-      this.immediateEffects.length !== this.prevImmediateEffects.length
+      this.prevLateEffects !== null &&
+      this.lateEffects.length !== this.prevLateEffects.length
     ) {
       throw new Error("Irregular number of hooks.");
     }
@@ -179,18 +179,18 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.off("update");
     this.off("render");
     this.off("unmount");
-    this.off("immediateMount");
-    this.off("immediateUpdate");
-    this.off("immediateRender");
-    this.off("immediateUnmount");
+    this.off("lateMount");
+    this.off("lateUpdate");
+    this.off("lateRender");
+    this.off("lateUnmount");
 
     this.prevEffects = this.effects;
 
     this.effects = [];
 
-    this.prevImmediateEffects = this.immediateEffects;
+    this.prevLateEffects = this.lateEffects;
 
-    this.immediateEffects = [];
+    this.lateEffects = [];
 
     clearTimeout(this.updateTimeout);
 
@@ -251,20 +251,20 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     this.effects.forEach((effect): void => effect.cleanUp());
   }
 
-  public addImmediateEffect(effect: Effect): void {
-    this.immediateEffects.push(effect);
+  public addLateEffect(effect: Effect): void {
+    this.lateEffects.push(effect);
   }
 
-  private runImmediateEffects(): void {
-    this.immediateEffects.forEach((effect, i): void => {
-      const prevEffect = this.prevImmediateEffects?.[i] ?? null;
+  private runLateEffects(): void {
+    this.lateEffects.forEach((effect, i): void => {
+      const prevEffect = this.prevLateEffects?.[i] ?? null;
 
       effect.run(prevEffect);
     });
   }
 
-  private cleanUpImmediateEffects(): void {
-    this.immediateEffects.forEach((effect): void => effect.cleanUp());
+  private cleanUpLateEffects(): void {
+    this.lateEffects.forEach((effect): void => effect.cleanUp());
   }
 
   public finishRender(): void {
@@ -274,27 +274,27 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
 
     setTimeout((): void => {
       if (!mounted) {
-        this.emit("mount");
+        this.emit("lateMount");
       } else {
         this.settleUpdate(true);
 
-        this.emit("update");
+        this.emit("lateUpdate");
       }
 
-      this.emit("render");
+      this.emit("lateRender");
 
-      this.runEffects();
+      this.runLateEffects();
     });
 
     if (!mounted) {
-      this.emit("immediateMount");
+      this.emit("mount");
     } else {
-      this.emit("immediateUpdate");
+      this.emit("update");
     }
 
-    this.emit("immediateRender");
+    this.emit("render");
 
-    this.runImmediateEffects();
+    this.runEffects();
   }
 
   public finishUnmount(): void {
@@ -306,13 +306,13 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
     setTimeout((): void => {
       this.settleNextUpdate(false);
 
-      this.emit("unmount");
+      this.emit("lateUnmount");
 
-      this.cleanUpEffects();
+      this.cleanUpLateEffects();
     });
 
-    this.emit("immediateUnmount");
+    this.emit("unmount");
 
-    this.cleanUpImmediateEffects();
+    this.cleanUpEffects();
   }
 }

@@ -239,15 +239,15 @@ export class Animation extends Emitter<AnimationSignatures> {
   }
 
   public bind(component: Component, listener: () => void): void {
-    component.on("immediateMount", (): void => {
+    component.on("mount", (): void => {
       this.on("update", listener);
     });
 
-    component.on("immediateUnmount", (): void => {
+    component.on("unmount", (): void => {
       this.off("update", listener);
     });
 
-    component.on("immediateRender", listener);
+    component.on("render", listener);
   }
 
   public use(listener: () => void): void {
@@ -261,14 +261,14 @@ export class Animation extends Emitter<AnimationSignatures> {
       listener();
     });
 
-    Hook.useImmediateMountLifecycle((): void => {
+    Hook.useMountLifecycle((): void => {
       this.on("update", callback);
     });
 
-    Hook.useImmediateUnmountLifecycle((): void => {
+    Hook.useUnmountLifecycle((): void => {
       this.off("update", callback);
     });
 
-    Hook.useImmediateRenderLifecycle(callback);
+    Hook.useRenderLifecycle(callback);
   }
 }

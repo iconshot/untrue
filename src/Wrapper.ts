@@ -94,20 +94,18 @@ export class Wrapper {
         const listener = (): void => {
           clearTimeout(timeout);
 
-          timeout = setTimeout((): void => {
-            this.compare();
-          });
+          timeout = setTimeout((): void => this.compare());
         };
 
-        this.on("immediateMount", (): void => {
+        this.on("mount", (): void => {
           for (const context of contexts) {
-            context.on("immediateUpdate", listener);
+            context.on("update", listener);
           }
         });
 
-        this.on("immediateUnmount", (): void => {
+        this.on("unmount", (): void => {
           for (const context of contexts) {
-            context.off("immediateUpdate", listener);
+            context.off("update", listener);
           }
         });
       }
