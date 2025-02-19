@@ -1,4 +1,4 @@
-import { EverEmitter, SignatureRecord, OnErrorClosure } from "everemitter";
+import { EverEmitter, SignatureRecord, OnErrorCallback } from "everemitter";
 
 export class Emitter<
   M extends SignatureRecord = SignatureRecord
@@ -11,7 +11,7 @@ export class Emitter<
     });
   }
 
-  public static onError: OnErrorClosure = (error): void => {
+  public static onError: OnErrorCallback = (error): void => {
     queueMicrotask((): void => {
       throw error;
     });
