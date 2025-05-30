@@ -3,7 +3,6 @@ import { Comparer } from "../Comparer";
 
 import { UpdatePromise } from "../Stateful/UpdatePromise";
 
-import { Hook } from "./Hook";
 import { Effect } from "./Effect";
 
 export type HooksterSignatures = {
@@ -65,11 +64,11 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   }
 
   public activate(): void {
-    Hook.activeHookster = this;
+    Hookster.activeHookster = this;
   }
 
   public deactivate(): void {
-    Hook.activeHookster = null;
+    Hookster.activeHookster = null;
 
     if (this.prevIndex !== null && this.index !== this.prevIndex) {
       throw new Error("Irregular number of hooks.");
@@ -315,4 +314,6 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
 
     this.cleanUpEffects();
   }
+
+  public static activeHookster: Hookster | null = null;
 }

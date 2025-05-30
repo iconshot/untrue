@@ -6,6 +6,7 @@ import { Persistor } from "./Persistor";
 import { Ref } from "./Ref";
 import { Var } from "./Var";
 import { Slot } from "./Slot";
+import { Emitter } from "./Emitter";
 
 export class Comparer {
   /*
@@ -52,13 +53,7 @@ export class Comparer {
 
     // for internal objects, check equality
 
-    if (
-      a instanceof Stateful ||
-      a instanceof Ref ||
-      a instanceof Var ||
-      a instanceof Persistor ||
-      a instanceof Animation
-    ) {
+    if (a instanceof Emitter || a instanceof Ref) {
       return a === b;
     }
 

@@ -255,7 +255,7 @@ export class Animation extends Emitter<AnimationSignatures> {
 
     listenerVar.value = listener;
 
-    const callback = Hook.useCallback(() => {
+    const callback = Hook.useCallback((): void => {
       const listener = listenerVar.value;
 
       listener();

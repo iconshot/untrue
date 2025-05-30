@@ -1,3 +1,5 @@
+import { SignatureRecord } from "everemitter";
+
 import { Animation } from "../Animation/Animation";
 
 import { Comparer } from "../Comparer";
@@ -10,10 +12,11 @@ import { UpdatePromise } from "../Stateful/UpdatePromise";
 
 import { Effect } from "./Effect";
 import { Hookster, HooksterSignatures } from "./Hookster";
+import { Emitter } from "../Emitter";
 
 export class Hook {
   public static useUpdate(): () => UpdatePromise {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -29,7 +32,7 @@ export class Hook {
   public static useState<K>(
     value: K
   ): [K, (value: K) => UpdatePromise, K | null] {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -51,7 +54,7 @@ export class Hook {
   }
 
   public static useRef<K>(value: K | null = null): Ref<K> {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -59,7 +62,7 @@ export class Hook {
 
     const ref: Ref<K> = hookster.hasValue()
       ? hookster.getValue()
-      : new Ref<K>(value);
+      : new Ref(value);
 
     hookster.addValue(ref);
 
@@ -67,7 +70,7 @@ export class Hook {
   }
 
   public static useVar<K>(value: K): Var<K> {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -75,7 +78,7 @@ export class Hook {
 
     const tmpVar: Var<K> = hookster.hasValue()
       ? hookster.getValue()
-      : new Var<K>(value);
+      : new Var(value);
 
     hookster.addValue(tmpVar);
 
@@ -83,7 +86,7 @@ export class Hook {
   }
 
   public static useAnimation(value: number): Animation {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -98,8 +101,24 @@ export class Hook {
     return animation;
   }
 
+  public static useEmitter<T extends SignatureRecord>(): Emitter<T> {
+    const hookster = Hookster.activeHookster;
+
+    if (hookster === null) {
+      throw new Error("Hook not available.");
+    }
+
+    const emitter: Emitter<T> = hookster.hasValue()
+      ? hookster.getValue()
+      : new Emitter();
+
+    hookster.addValue(emitter);
+
+    return emitter;
+  }
+
   public static useMemo<K>(callback: () => K, params: any[] = []): K {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -142,7 +161,7 @@ export class Hook {
     name: K,
     listener: () => any
   ): void {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -187,7 +206,7 @@ export class Hook {
     callback: () => void | (() => void),
     params: any[] | null = null
   ): void {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -230,7 +249,7 @@ export class Hook {
     callback: () => void | (() => void),
     params: any[] | null = null
   ): void {
-    const hookster = this.activeHookster;
+    const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
@@ -347,6 +366,4 @@ export class Hook {
 
     return a.every((element, i): boolean => element === b[i]);
   }
-
-  public static activeHookster: Hookster | null = null;
 }

@@ -8,62 +8,18 @@ import $, {
 
 import { Comparer } from "./Comparer";
 
-import { State } from "./Stateful/Stateful";
 import { Component, Props } from "./Stateful/Component";
 import { Context } from "./Stateful/Context";
-import { UpdatePromise } from "./Stateful/UpdatePromise";
-
-class PublicComponent<K extends Props, L extends State> extends Component<
-  K,
-  L
-> {
-  public props: K;
-  public prevProps: K | null = null;
-  public nextProps: K | null = null;
-
-  public state: L;
-  public prevState: L | null = null;
-  public nextState: L | null = null;
-
-  public mounted: boolean = false;
-
-  public override update(): UpdatePromise {
-    return super.update();
-  }
-
-  public override updateState(state: Partial<L>): UpdatePromise {
-    return super.updateState(state);
-  }
-}
 
 export class Wrapper {
-  public static wrapComponent<K extends Props = Props, L extends State = State>(
-    initClosure: (
-      self: PublicComponent<K, L>
-    ) => ((props: K, state: L) => any) | null | void
-  ): ClassComponent<K> {
-    return class ComponentWrapper extends PublicComponent<K, L> {
-      private renderClosure: ((props: K, state: L) => any) | null = null;
-
-      public override init(): void {
-        this.renderClosure = initClosure(this) ?? null;
-      }
-
-      public override render(): any {
-        if (this.renderClosure === null) {
-          return null;
-        }
-
-        return this.renderClosure(this.props, this.state);
-      }
-    };
-  }
-
   public static wrapProps<A extends Props, B>(
     Child: ComponentType<A & B>,
     callback: (props: PropsNoChildren<A>) => B | null
   ): (props: A) => Slot<A & B> | null {
-    return function PropsWrapper({ children, ...props }: A) {
+    return function PropsWrapper({
+      children,
+      ...props
+    }: A): Slot<A & B> | null {
       const result = callback(props);
 
       if (result === null) {
