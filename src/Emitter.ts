@@ -1,7 +1,11 @@
-import { EverEmitter, SignatureRecord, OnErrorCallback } from "everemitter";
+import {
+  EverEmitter,
+  EverEmitterSignatures,
+  OnErrorCallback,
+} from "everemitter";
 
 export class Emitter<
-  M extends SignatureRecord = SignatureRecord
+  M extends EverEmitterSignatures = EverEmitterSignatures
 > extends EverEmitter<M> {
   constructor() {
     super({

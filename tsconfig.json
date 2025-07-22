@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
+    "strict": true,
     "outDir": "./dist",
     "target": "es2020",
     "module": "Node16",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "strictNullChecks": true,
     "declaration": true,
     "types": [],
     "removeComments": true

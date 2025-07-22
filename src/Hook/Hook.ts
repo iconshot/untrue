@@ -1,4 +1,4 @@
-import { SignatureRecord } from "everemitter";
+import { EverEmitterSignatures } from "everemitter";
 
 import { Animation } from "../Animation/Animation";
 
@@ -101,7 +101,7 @@ export class Hook {
     return animation;
   }
 
-  public static useEmitter<T extends SignatureRecord>(): Emitter<T> {
+  public static useEmitter<T extends EverEmitterSignatures>(): Emitter<T> {
     const hookster = Hookster.activeHookster;
 
     if (hookster === null) {

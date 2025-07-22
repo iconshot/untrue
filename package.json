@@ -1,6 +1,6 @@
 {
   "name": "untrue",
-  "version": "5.15.1",
+  "version": "5.15.2",
   "description": "Render user interfaces.",
   "homepage": "https://untrue.dev",
   "repository": {
@@ -23,6 +23,6 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "everemitter": "^1.2.3"
+    "everemitter": "^1.2.4"
   }
 }
