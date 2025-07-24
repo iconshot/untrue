@@ -8,7 +8,7 @@ export class AnimationFrame {
       const now = performance.now();
 
       callback(now);
-    }, 1000 / 60);
+    }, 1000 / 60) as unknown as number;
   }
 
   public static cancel(frame: number | undefined): void {

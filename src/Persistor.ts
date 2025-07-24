@@ -162,7 +162,7 @@ export class Persistor extends Emitter<PersistorSignatures> {
 
       timeout = setTimeout((): void => {
         this.persist();
-      });
+      }) as unknown as number;
     };
 
     for (const key in this.contexts) {

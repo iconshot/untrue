@@ -146,7 +146,9 @@ export class Hookster extends Emitter<AllHooksterSignatures> {
   private queueUpdate(): UpdatePromise {
     clearTimeout(this.updateTimeout);
 
-    this.updateTimeout = setTimeout((): void => this.startUpdate());
+    this.updateTimeout = setTimeout((): void =>
+      this.startUpdate()
+    ) as unknown as number;
 
     this.updateQueued = true;
 

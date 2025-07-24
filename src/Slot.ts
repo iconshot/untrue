@@ -32,25 +32,25 @@ export type Children =
   | undefined
   | Slot;
 
-type DefaultProps = Props & { [key: string]: any };
+export type ExtendedProps = Props & { [key: string]: any };
 
-function $<K extends Props = DefaultProps>(
+function $<K extends Props = ExtendedProps>(
   contentType: ContentType<K>
 ): Slot<K>;
-function $<K extends Props = DefaultProps>(
+function $<K extends Props = ExtendedProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>
 ): Slot<K>;
-function $<K extends Props = DefaultProps>(
+function $<K extends Props = ExtendedProps>(
   contentType: ContentType<K>,
   children: Children
 ): Slot<K>;
-function $<K extends Props = DefaultProps>(
+function $<K extends Props = ExtendedProps>(
   contentType: ContentType<K>,
   attributes: Attributes<K>,
   children: Children
 ): Slot<K>;
-function $<K extends Props = DefaultProps>(
+function $<K extends Props = ExtendedProps>(
   contentType: ContentType<K>,
   ...args: any[]
 ): Slot<K> {
@@ -115,7 +115,7 @@ function $<K extends Props = DefaultProps>(
 
 export default $;
 
-export class Slot<K extends Props = DefaultProps> {
+export class Slot<K extends Props = ExtendedProps> {
   private contentType: ContentType<K>;
   private attributes: Attributes<K> | null;
   private children: any[];

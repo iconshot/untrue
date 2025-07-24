@@ -50,7 +50,7 @@ export class Wrapper {
         const listener = (): void => {
           clearTimeout(timeout);
 
-          timeout = setTimeout((): void => this.compare());
+          timeout = setTimeout((): void => this.compare()) as unknown as number;
         };
 
         this.on("mount", (): void => {

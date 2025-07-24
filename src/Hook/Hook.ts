@@ -326,7 +326,7 @@ export class Hook {
           }
 
           update();
-        });
+        }) as unknown as number;
       };
 
       for (const context of contexts) {
