@@ -4,7 +4,7 @@ import { Ref } from "../Ref";
 
 import { Children, ClassComponent, FunctionComponent, Slot } from "./Slot";
 
-type BaseAttributes = {
+type HTMLBaseAttributes = {
   id: string;
   class: string;
   title: string;
@@ -58,7 +58,7 @@ type BaseAttributes = {
   onscroll: (event: Event) => any;
 };
 
-type ElementMap = {
+type HTMLElementMap = {
   div: {
     element: HTMLDivElement;
     attributes: {};
@@ -278,33 +278,35 @@ type AttributesOfFunction<U extends FunctionComponent<any>> = U extends (
   ? Omit<P, "children">
   : never;
 
-type AttributesOfElement<U extends keyof ElementMap> = AllOptional<
-  BaseAttributes & ElementMap[U]["attributes"] & AttributesOf<null>
+type AttributesOfElement<U extends keyof HTMLElementMap> = AllOptional<
+  HTMLBaseAttributes & HTMLElementMap[U]["attributes"] & AttributesOf<null>
 >;
 
 type RefValueOf<U> = U extends ClassComponent<any>
   ? InstanceType<U>
-  : U extends keyof ElementMap
-  ? ElementMap[U]["element"]
+  : U extends keyof HTMLElementMap
+  ? HTMLElementMap[U]["element"]
   : null;
 
 type AttributesOf<U> = U extends ClassComponent<any>
   ? AttributesOfClass<U>
   : U extends FunctionComponent<any>
   ? AttributesOfFunction<U>
-  : U extends keyof ElementMap
+  : U extends keyof HTMLElementMap
   ? AttributesOfElement<U>
   : U extends null
   ? Record<string, any>
   : null;
 
-type NotInElementMap<U extends string> = U extends keyof ElementMap ? never : U;
+type NotInHTMLElementMap<U extends string> = U extends keyof HTMLElementMap
+  ? never
+  : U;
 
 function $<
   U extends
     | ClassComponent<any>
     | FunctionComponent<any>
-    | keyof ElementMap
+    | keyof HTMLElementMap
     | null
 >(
   contentType: U,
@@ -315,7 +317,7 @@ function $<
   U extends
     | ClassComponent<any>
     | FunctionComponent<any>
-    | keyof ElementMap
+    | keyof HTMLElementMap
     | null
 >(
   contentType: U,
@@ -324,12 +326,12 @@ function $<
     : never
 ): Slot;
 function $<U extends string>(
-  contentType: NotInElementMap<U>,
+  contentType: NotInHTMLElementMap<U>,
   attributes: Attributes<Element, AttributesOf<null>>,
   children?: Children
 ): Slot;
 function $<U extends string>(
-  contentType: NotInElementMap<U>,
+  contentType: NotInHTMLElementMap<U>,
   children?: Children
 ): Slot;
 function $(contentType: any, ...args: any[]): Slot {
