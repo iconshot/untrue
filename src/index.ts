@@ -1,12 +1,11 @@
-export { default } from "./Slot";
-
-export * from "./Slot";
 export * from "./Ref";
 export * from "./Var";
-export * from "./Wrapper";
 export * from "./Persistor";
 export * from "./Comparer";
 export * from "./Emitter";
+
+export { default } from "./Slot/$";
+export * from "./Slot/Slot";
 
 export { State } from "./Stateful/Stateful";
 export * from "./Stateful/Context";

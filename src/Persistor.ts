@@ -1,5 +1,5 @@
 import { Emitter } from "./Emitter";
-import { Children, ClassComponent } from "./Slot";
+import { Children, ClassComponent } from "./Slot/Slot";
 
 import { State } from "./Stateful/Stateful";
 import { Component, Props } from "./Stateful/Component";

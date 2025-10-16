@@ -1,5 +1,5 @@
 import { Ref } from "./Ref";
-import { Slot } from "./Slot";
+import { Slot } from "./Slot/Slot";
 import { Emitter } from "./Emitter";
 
 export class Comparer {

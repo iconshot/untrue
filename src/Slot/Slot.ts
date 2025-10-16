@@ -1,10 +1,12 @@
-import { Ref } from "./Ref";
+import { Component, Props } from "../Stateful/Component";
+import { State } from "../Stateful/Stateful";
 
-import { Component, Props } from "./Stateful/Component";
+import { Ref } from "../Ref";
 
-export type ClassComponent<K extends Props = Props> = new (
-  props: K
-) => Component<K>;
+export type ClassComponent<
+  K extends Props = Props,
+  L extends State = State
+> = new (props: K) => Component<K, L>;
 
 export type FunctionComponent<K extends Props = Props> = (
   props: K,
@@ -15,13 +17,7 @@ export type ComponentType<K extends Props = Props> =
   | ClassComponent<K>
   | FunctionComponent<K>;
 
-export type ContentType<K extends Props> = ComponentType<K> | string | null;
-
-export type PropsNoChildren<K extends Props> = Omit<K, "children">;
-
-export type Attributes<K extends Props> = PropsNoChildren<
-  K & { key?: any; ref?: Ref<any> | null }
->;
+export type ContentType = ComponentType | string | null;
 
 export type Children =
   | boolean
@@ -32,99 +28,20 @@ export type Children =
   | undefined
   | Slot;
 
-export type ExtendedProps = Props & { [key: string]: any };
+export type PropsNoChildren<K extends Props> = Omit<K, "children">;
 
-function $<K extends Props = ExtendedProps>(
-  contentType: ContentType<K>
-): Slot<K>;
-function $<K extends Props = ExtendedProps>(
-  contentType: ContentType<K>,
-  attributes: Attributes<K>
-): Slot<K>;
-function $<K extends Props = ExtendedProps>(
-  contentType: ContentType<K>,
-  children: Children
-): Slot<K>;
-function $<K extends Props = ExtendedProps>(
-  contentType: ContentType<K>,
-  attributes: Attributes<K>,
-  children: Children
-): Slot<K>;
-function $<K extends Props = ExtendedProps>(
-  contentType: ContentType<K>,
-  ...args: any[]
-): Slot<K> {
-  let attributes: Attributes<K> | null = null;
-  let children: any[] = [];
+export type SlotAttributes = Record<string, any>;
 
-  switch (args.length) {
-    case 0: {
-      break;
-    }
-
-    case 1: {
-      if (Array.isArray(args[0])) {
-        children = args[0];
-      } else if (args[0] instanceof Slot) {
-        children = [args[0]];
-      } else if (args[0] !== null && typeof args[0] === "object") {
-        attributes = args[0];
-      } else {
-        children = [args[0]];
-      }
-
-      break;
-    }
-
-    default: {
-      attributes = args[0];
-
-      children = Array.isArray(args[1]) ? args[1] : [args[1]];
-
-      break;
-    }
-  }
-
-  const tmpContentType: any = contentType;
-
-  const isClass =
-    typeof tmpContentType === "function" &&
-    /^class\s/.test(Function.prototype.toString.call(tmpContentType));
-
-  if (
-    !(
-      tmpContentType === null ||
-      (isClass &&
-        (tmpContentType.prototype === Component ||
-          tmpContentType.prototype instanceof Component)) ||
-      (!isClass && typeof tmpContentType === "function") ||
-      typeof tmpContentType === "string"
-    )
-  ) {
-    throw new Error(
-      "Content type must be a Component class, function, string or null."
-    );
-  }
-
-  if (typeof attributes !== "object" || Array.isArray(attributes)) {
-    throw new Error("Attributes must be object or null.");
-  }
-
-  return new Slot(contentType, attributes, children);
-}
-
-export default $;
-
-export class Slot<K extends Props = ExtendedProps> {
-  private contentType: ContentType<K>;
-  private attributes: Attributes<K> | null;
+export class Slot {
+  private contentType: ContentType;
+  private attributes: SlotAttributes | null;
   private children: any[];
 
   private propsChildren: any[] | null = null;
 
   constructor(
-    contentType: ContentType<K>,
-    attributes: Attributes<K> | null,
+    contentType: ContentType,
+    attributes: SlotAttributes | null,
     children: any[]
   ) {
     children = Slot.parseChildren(children);
@@ -141,11 +58,11 @@ export class Slot<K extends Props = ExtendedProps> {
     this.children = children;
   }
 
-  public getContentType(): ContentType<K> {
+  public getContentType(): ContentType {
     return this.contentType;
   }
 
-  public getAttributes(): Attributes<K> | null {
+  public getAttributes(): SlotAttributes | null {
     return this.attributes;
   }
 
@@ -166,7 +83,7 @@ export class Slot<K extends Props = ExtendedProps> {
   }
 
   public isClass(): boolean {
-    const tmpContentType: any = this.contentType;
+    const tmpContentType = this.contentType as any;
 
     return (
       tmpContentType !== null &&
@@ -192,9 +109,9 @@ export class Slot<K extends Props = ExtendedProps> {
       return null;
     }
 
-    const { key = null } = this.attributes;
+    const { key } = this.attributes;
 
-    return key;
+    return key ?? null;
   }
 
   public getRef(): Ref<any> | null {
@@ -202,19 +119,23 @@ export class Slot<K extends Props = ExtendedProps> {
       return null;
     }
 
-    const { ref = null } = this.attributes;
+    const { ref } = this.attributes;
+
+    if (!(ref instanceof Ref)) {
+      return null;
+    }
 
     return ref;
   }
 
-  public getProps(): K {
+  public getProps(): SlotAttributes {
     const { key, ref, ...tmpAttributes } = this.attributes ?? {};
 
     const children = this.propsChildren ?? [];
 
     const props = { ...tmpAttributes, children };
 
-    return props as K;
+    return props;
   }
 
   /*
