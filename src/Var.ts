@@ -16,7 +16,7 @@ export class Var<K> extends Emitter<VarSignatures> {
     this.#value = value;
   }
 
-  get value() {
+  get value(): K {
     return this.#value;
   }
 
