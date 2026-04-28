@@ -28,7 +28,7 @@ export class Effect extends Emitter<EffectSignatures> {
 
   constructor(
     private callback: () => void | (() => void),
-    private params: any[] | null
+    private dependencies: any[] | null,
   ) {
     super();
 
@@ -46,9 +46,9 @@ export class Effect extends Emitter<EffectSignatures> {
   }
 
   public run(prevEffect: Effect | null): void {
-    if (this.params !== null) {
+    if (this.dependencies !== null) {
       if (prevEffect !== null) {
-        const equal = Hook.compare(this.params, prevEffect.params);
+        const equal = Hook.compare(this.dependencies, prevEffect.dependencies);
 
         if (equal) {
           this.cleanup = prevEffect.cleanup;

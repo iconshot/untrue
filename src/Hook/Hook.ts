@@ -14,6 +14,11 @@ import { Effect } from "./Effect";
 import { Hookster, HooksterSignatures } from "./Hookster";
 import { Emitter } from "../Emitter";
 
+type Memo<K> = {
+  value: K;
+  dependencies: any[] | null;
+};
+
 export class Hook {
   public static useUpdate(): () => UpdatePromise {
     const hookster = Hookster.activeHookster;
@@ -30,7 +35,7 @@ export class Hook {
   }
 
   public static useState<K>(
-    value: K
+    value: K,
   ): [K, (value: K) => UpdatePromise, K | null] {
     const hookster = Hookster.activeHookster;
 
@@ -117,33 +122,33 @@ export class Hook {
     return emitter;
   }
 
-  public static useMemo<K>(callback: () => K, params: any[] = []): K {
+  public static useMemo<K>(
+    callback: () => K,
+    dependencies: any[] | null = null,
+  ): K {
     const hookster = Hookster.activeHookster;
 
     if (hookster === null) {
       throw new Error("Hook not available.");
     }
 
-    type Memo = {
-      value: K;
-      params: any[];
-    };
-
-    const prevMemo: Memo | null = hookster.hasValue()
+    const prevMemo: Memo<K> | null = hookster.hasValue()
       ? hookster.getValue()
       : null;
 
-    let memo: Memo | null = null;
+    let memo: Memo<K> | null = null;
 
-    if (prevMemo !== null) {
-      const equal = this.compare(params, prevMemo.params);
+    if (dependencies !== null) {
+      if (prevMemo !== null) {
+        const equal = this.compare(dependencies, prevMemo.dependencies);
 
-      if (equal) {
-        memo = { value: prevMemo.value, params };
+        if (equal) {
+          memo = { value: prevMemo.value, dependencies };
+        }
       }
     }
 
-    memo ??= { value: callback(), params };
+    memo ??= { value: callback(), dependencies };
 
     hookster.addValue(memo);
 
@@ -152,14 +157,14 @@ export class Hook {
 
   public static useCallback<K, T extends any[] = any[]>(
     callback: (...args: T) => K,
-    params: any[] = []
+    dependencies: any[] | null = null,
   ): (...args: T) => K {
-    return this.useMemo((): ((...args: T) => K) => callback, params);
+    return this.useMemo((): ((...args: T) => K) => callback, dependencies);
   }
 
   public static useLifecycle<K extends keyof HooksterSignatures>(
     name: K,
-    listener: () => any
+    listener: () => any,
   ): void {
     const hookster = Hookster.activeHookster;
 
@@ -204,7 +209,7 @@ export class Hook {
 
   public static useEffect(
     callback: () => void | (() => void),
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     const hookster = Hookster.activeHookster;
 
@@ -212,7 +217,7 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const effect = new Effect(callback, params);
+    const effect = new Effect(callback, dependencies);
 
     hookster.addEffect(effect);
   }
@@ -223,7 +228,7 @@ export class Hook {
 
   public static useUpdateEffect(
     callback: () => void | (() => void),
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     const mountedVar = this.useVar(false);
 
@@ -233,21 +238,21 @@ export class Hook {
       }
 
       mountedVar.value = true;
-    }, params);
+    }, dependencies);
   }
 
   public static useAsyncEffect(
     callback: () => Promise<void>,
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     this.useEffect((): void => {
       callback();
-    }, params);
+    }, dependencies);
   }
 
   public static useLateEffect(
     callback: () => void | (() => void),
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     const hookster = Hookster.activeHookster;
 
@@ -255,7 +260,7 @@ export class Hook {
       throw new Error("Hook not available.");
     }
 
-    const effect = new Effect(callback, params);
+    const effect = new Effect(callback, dependencies);
 
     hookster.addLateEffect(effect);
   }
@@ -266,7 +271,7 @@ export class Hook {
 
   public static useLateUpdateEffect(
     callback: () => void | (() => void),
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     const mountedVar = this.useVar(false);
 
@@ -276,21 +281,21 @@ export class Hook {
       }
 
       mountedVar.value = true;
-    }, params);
+    }, dependencies);
   }
 
   public static useLateAsyncEffect(
     callback: () => Promise<void>,
-    params: any[] | null = null
+    dependencies: any[] | null = null,
   ): void {
     this.useLateEffect((): void => {
       callback();
-    }, params);
+    }, dependencies);
   }
 
   public static useContext<B>(
     context: Context | Context[],
-    selector: () => B
+    selector: () => B,
   ): B {
     const contexts = Array.isArray(context) ? context : [context];
 
@@ -347,7 +352,7 @@ export class Hook {
 
   Comparer.compare does a deep comparison
   while Hook.compare does a simpler shallow comparison
-  based on "params" used in useEffect, useMemo, etc
+  based on "dependencies" used in useEffect, useMemo, etc
 
   */
 
